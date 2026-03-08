@@ -36,6 +36,11 @@ ff_source_tarball:=firefox-$(version).source.tar.xz
 lw_source_dir:=librewolf-$(version)-$(release)
 lw_source_tarball:=librewolf-$(version)-$(release).source$(ext)
 
+CFLAGS  ?= -fsanitize=cfi
+CXXFLAGS ?= -fsanitize=cfi
+
+export CFLAGS CXXFLAGS
+
 help :
 
 	@echo "use: $(MAKE) [all] [check] [clean] [veryclean] [bootstrap] [build] [package] [run]"
