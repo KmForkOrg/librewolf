@@ -36,9 +36,9 @@ ff_source_tarball:=firefox-$(version).source.tar.xz
 lw_source_dir:=librewolf-$(version)-$(release)
 lw_source_tarball:=librewolf-$(version)-$(release).source$(ext)
 
-CFLAGS  ?= -flto -fsanitize=cfi -fvisibility=hidden
-CXXFLAGS ?= -flto -fsanitize=cfi -fvisibility=hidden
-LDFLAGS ?= -flto
+CFLAGS  ?= -fsanitize=cfi -fvisibility=hidden
+CXXFLAGS ?= -fsanitize=cfi -fvisibility=hidden
+LDFLAGS ?=
 
 export CFLAGS CXXFLAGS
 
