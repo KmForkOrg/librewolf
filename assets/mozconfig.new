@@ -32,8 +32,8 @@ mk_add_options MOZ_DATA_REPORTING=0
 mk_add_options MOZ_SERVICES_HEALTHREPORT=0
 mk_add_options MOZ_TELEMETRY_REPORTING=0
 
-export CFLAGS = -fstack-clash-protection
-export CXXFLAGS = -fstack-clash-protection
+export CFLAGS = "-fstack-clash-protection"
+export CXXFLAGS = "-fstack-clash-protection"
 export LDFLAGS =
  
 # Add your own stuff, libraries, architecture, etc..
