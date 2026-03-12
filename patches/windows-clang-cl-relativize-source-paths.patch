@@ -1,0 +1,77 @@
+--- a/config/rules.mk
++++ b/config/rules.mk
+@@ -577,13 +577,13 @@
+ $(COBJS):
+ 	$(REPORT_BUILD_VERBOSE)
+ 	$(call BUILDSTATUS,OBJECT_FILE $@)
+-	$(CC) $(OUTOPTION)$@ -c $(COMPILE_CFLAGS) $($(notdir $<)_FLAGS) $<
++	$(CC) $(OUTOPTION)$@ -c $(COMPILE_CFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 	$(call BUILDSTATUS,END_Object $@)
+ 
+ $(CWASMOBJS):
+ 	$(REPORT_BUILD_VERBOSE)
+ 	$(call BUILDSTATUS,OBJECT_FILE $@)
+-	$(WASM_CC) -o $@ -c $(WASM_CFLAGS) $($(notdir $<)_FLAGS) $<
++	$(WASM_CC) -o $@ -c $(WASM_CFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 	$(call BUILDSTATUS,END_Object $@)
+ 
+ WINEWRAP = $(if $(and $(filter %.exe,$1),$(WINE)),$(WINE) $1,$1)
+@@ -667,42 +667,42 @@
+ $(CPPOBJS):
+ 	$(REPORT_BUILD_VERBOSE)
+ 	$(call BUILDSTATUS,OBJECT_FILE $@)
+-	$(CCC) $(OUTOPTION)$@ -c $(COMPILE_CXXFLAGS) $($(notdir $<)_FLAGS) $<
++	$(CCC) $(OUTOPTION)$@ -c $(COMPILE_CXXFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 	$(call BUILDSTATUS,END_Object $@)
+ 
+ $(CPPWASMOBJS):
+ 	$(REPORT_BUILD_VERBOSE)
+ 	$(call BUILDSTATUS,OBJECT_FILE $@)
+-	$(WASM_CXX) -o $@ -c $(WASM_CXXFLAGS) $($(notdir $<)_FLAGS) $<
++	$(WASM_CXX) -o $@ -c $(WASM_CXXFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 	$(call BUILDSTATUS,END_Object $@)
+ 
+ $(CMMOBJS):
+ 	$(REPORT_BUILD_VERBOSE)
+ 	$(call BUILDSTATUS,OBJECT_FILE $@)
+-	$(CCC) -o $@ -c $(COMPILE_CXXFLAGS) $(COMPILE_CMMFLAGS) $($(notdir $<)_FLAGS) $<
++	$(CCC) -o $@ -c $(COMPILE_CXXFLAGS) $(COMPILE_CMMFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 	$(call BUILDSTATUS,END_Object $@)
+ 
+ $(CMOBJS):
+ 	$(REPORT_BUILD_VERBOSE)
+ 	$(call BUILDSTATUS,OBJECT_FILE $@)
+-	$(CC) -o $@ -c $(COMPILE_CFLAGS) $(COMPILE_CMFLAGS) $($(notdir $<)_FLAGS) $<
++	$(CC) -o $@ -c $(COMPILE_CFLAGS) $(COMPILE_CMFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 	$(call BUILDSTATUS,END_Object $@)
+ 
+ $(filter %.s,$(CPPSRCS:%.cpp=%.s)): %.s: %.cpp $(call mkdir_deps,$(MDDEPDIR))
+ 	$(REPORT_BUILD_VERBOSE)
+-	$(CCC) -S $(COMPILE_CXXFLAGS) $($(notdir $<)_FLAGS) $<
++	$(CCC) -S $(COMPILE_CXXFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 
+ $(filter %.s,$(CPPSRCS:%.cc=%.s)): %.s: %.cc $(call mkdir_deps,$(MDDEPDIR))
+ 	$(REPORT_BUILD_VERBOSE)
+-	$(CCC) -S $(COMPILE_CXXFLAGS) $($(notdir $<)_FLAGS) $<
++	$(CCC) -S $(COMPILE_CXXFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 
+ $(filter %.s,$(CPPSRCS:%.cxx=%.s)): %.s: %.cpp $(call mkdir_deps,$(MDDEPDIR))
+ 	$(REPORT_BUILD_VERBOSE)
+-	$(CCC) -S $(COMPILE_CXXFLAGS) $($(notdir $<)_FLAGS) $<
++	$(CCC) -S $(COMPILE_CXXFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 
+ $(filter %.s,$(CSRCS:%.c=%.s)): %.s: %.c $(call mkdir_deps,$(MDDEPDIR))
+ 	$(REPORT_BUILD_VERBOSE)
+-	$(CC) -S $(COMPILE_CFLAGS) $($(notdir $<)_FLAGS) $<
++	$(CC) -S $(COMPILE_CFLAGS) $($(notdir $<)_FLAGS) $(call relativize,$<)
+ 
+ ifneq (,$(filter %.i,$(MAKECMDGOALS)))
+ # Call as $(call _group_srcs,extension,$(SRCS)) - this will create a list
+@@ -729,7 +729,7 @@
+ $$(_PREPROCESSED_$1_FILES): %.i: %.$1
+ 	$$(REPORT_BUILD_VERBOSE)
+ 	$$(addprefix $$(MKDIR) -p ,$$(filter-out .,$$(@D)))
+-	$$($3) -C $$(PREPROCESS_OPTION)$$@ $(foreach var,$4,$$($(var))) $$($$(notdir $$<)_FLAGS) $$<
++	$$($3) -C $$(PREPROCESS_OPTION)$$@ $(foreach var,$4,$$($(var))) $$($$(notdir $$<)_FLAGS) $$(call relativize,$$<)
+
+ endef
