@@ -1,0 +1,26 @@
+diff --git a/browser/components/preferences/widgets/setting-group/setting-group.stories.mjs b/browser/components/preferences/widgets/setting-group/setting-group.stories.mjs
+index 3c19b16967..e8a538b124 100644
+--- a/browser/components/preferences/widgets/setting-group/setting-group.stories.mjs
++++ b/browser/components/preferences/widgets/setting-group/setting-group.stories.mjs
+@@ -30,7 +30,7 @@ browser-layout-radio-vertical =
+   .description = Displayed on the side, in the sidebar
+ browser-layout-sidebar =
+   .label = Show sidebar
+-  .description = Quickly access bookmarks, tabs from your phone, AI chatbots, and more without leaving your main view
++  .description = Quickly access bookmarks, tabs from your phone, and more without leaving your main view
+ cookies-and-site-data =
+   .label = Cookies and Site Data
+   .description = Manage and delete cookies, history, cache, and site settings.
+diff --git a/browser/locales/en-US/browser/preferences/preferences.ftl b/browser/locales/en-US/browser/preferences/preferences.ftl
+index 7d40e90522..61b420ff2f 100644
+--- a/browser/locales/en-US/browser/preferences/preferences.ftl
++++ b/browser/locales/en-US/browser/preferences/preferences.ftl
+@@ -323,7 +323,7 @@ browser-layout-vertical-tabs2 =
+ 
+ browser-layout-show-sidebar2 =
+     .label = Show sidebar
+-    .description = Quickly access bookmarks, tabs from your phone, AI chatbots, and more without leaving your main view.
++    .description = Quickly access bookmarks, tabs from your phone, and more without leaving your main view.
+ 
+ ## General Section - Language & Appearance
+ 
