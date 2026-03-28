@@ -68,7 +68,7 @@ full_build_stage2_macos:
 	echo "VERSION=$$(cat ../version)-$$(cat ../release)" > env.sh
 	echo "WORKDIR=$$(pwd)/WORKDIR" >> env.sh
 	echo "TARGET=macos" >> env.sh
-	echo "ARCH=x86_64" >> env.sh
+	echo "ARCH=arm64" >> env.sh
 	echo "SOURCEDIR=$$(pwd)/SOURCEDIR/librewolf-$$(cat ../version)-$$(cat ../release)" >> env.sh
 	cat env.sh
 
