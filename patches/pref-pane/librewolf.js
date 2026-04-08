@@ -42,6 +42,8 @@ Preferences.addAll([
   // Google safe browsing check downloads
   //{ id: "browser.safebrowsing.downloads.enabled", type: "bool" }, //Also already added
   { id: "toolkit.legacyUserProfileCustomizations.stylesheets", type: "bool" },
+  // Advanced
+  { id: "librewolf.advanced.user", type: "bool" },
 ]);
 
 Preferences.addSetting({
@@ -149,6 +151,27 @@ Preferences.addSetting({
   },
 });
 
+Preferences.addSetting({
+  id: "librewolfAdvancedUser",
+  pref: "librewolf.advanced.user",
+});
+
+Preferences.addSetting({
+  id: "librewolfHTTPSOnly",
+  deps: ["librewolfAdvancedUser"],
+  get: (value) => value = Services.prefs.prefIsLocked("dom.security.https_only_mode"),
+  set: (value) => {
+    if (!value) {
+      Services.prefs.lockPref("dom.security.https_only_mode");
+    } else {
+      Services.prefs.unlockPref("dom.security.https_only_mode");
+    }
+  },
+  disabled: ({librewolfAdvancedUser}) => {
+    return !librewolfAdvancedUser.value;
+  },
+});
+
 
 function openProfileDirectory() {
   // Get the profile directory.
@@ -178,6 +201,7 @@ var gLibrewolfPane = {
     initSettingGroup("librewolfNetworking");
     initSettingGroup("librewolfPrivacy");
     initSettingGroup("librewolfFingerprinting");
+    initSettingGroup("librewolfAdvanced");
 
     // Set event listener on open profile directory button
     setEventListener("librewolf-open-profile", "command", openProfileDirectory);

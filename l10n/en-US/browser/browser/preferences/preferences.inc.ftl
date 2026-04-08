@@ -55,6 +55,14 @@ librewolf-goog-safe-checkbox =
     .label = Enable Google Safe Browsing
 librewolf-goog-safe-download-checkbox =
     .label = Scan downloads
+librewolf-advanced-heading2 =
+    .label = Advanced settings
+librewolf-advanced-checkbox2 =
+    .label = Allow changing advanced settings
+    .description = Use at your own risk!
+librewolf-https-lock-checkbox2 =
+    .label = Unlocks the HTTPS UI component/preference
+    .description = Should only be used when actually needed (i2p as an example).
 # In-depth descriptions
 librewolf-ocsp-description = Prevent connecting to a website if the OCSP check cannot be performed.
 librewolf-ocsp-warning1 = This increases security, but it will cause breakage when an OCSP server is down.
