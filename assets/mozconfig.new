@@ -16,6 +16,8 @@ ac_add_options --enable-rust-simd
 ac_add_options --enable-replace-malloc
 ac_add_options --enable-jemalloc
 
+ac_add_options --enable-disk-remnant-avoidance
+
 ac_add_options --with-app-name=librewolf
 ac_add_options --with-branding=browser/branding/librewolf
 
