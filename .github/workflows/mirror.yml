@@ -1,0 +1,21 @@
+name: Mirror from Codeberg
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mirror Codeberg to GitHub
+        run: |
+          git clone --mirror https://codeberg.org/librewolf/source.git repo
+          cd repo
+          for ref in $(git for-each-ref --format='%(refname)' refs/pull/); do
+            git update-ref -d "$ref"
+          done
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/KmForkOrg/librewolf.git \
+            'refs/heads/*:refs/heads/*' \
+            'refs/tags/*:refs/tags/*'
