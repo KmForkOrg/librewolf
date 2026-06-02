@@ -16,6 +16,6 @@ jobs:
           for ref in $(git for-each-ref --format='%(refname)' refs/pull/); do
             git update-ref -d "$ref"
           done
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/KmForkOrg/librewolf.git \
+          git push https://x-access-token:${{ secrets.GH_TOK }}@github.com/KmForkOrg/librewolf.git \
             'refs/heads/*:refs/heads/*' \
             'refs/tags/*:refs/tags/*'
