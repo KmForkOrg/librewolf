@@ -46,7 +46,7 @@ jobs:
       ff_display: ${{ steps.detect.outputs.FF_DISPLAY }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -84,7 +84,7 @@ jobs:
       image: codeberg.org/librewolf/bsys6:dind
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           persist-credentials: false
@@ -130,7 +130,7 @@ jobs:
       image: codeberg.org/librewolf/bsys6:dind
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           persist-credentials: false
@@ -176,7 +176,7 @@ jobs:
       image: codeberg.org/librewolf/bsys6:dind
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           persist-credentials: false
