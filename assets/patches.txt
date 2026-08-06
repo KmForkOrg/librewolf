@@ -10,6 +10,7 @@ patches/extensions-setUninstallURL.patch
 patches/firefox-in-ua.patch
 patches/fix-canvas-extraction-permission.patch
 patches/fpp-canvas-fix.patch
+patches/fpp-nightly.patch
 patches/fullpage-translations-customization.patch
 patches/fullpage-translations.patch
 patches/hide-passwordmgr.patch

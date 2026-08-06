@@ -1,0 +1,20 @@
+diff --git a/toolkit/components/resistfingerprinting/RFPTargetsDefault.inc b/toolkit/components/resistfingerprinting/RFPTargetsDefault.inc
+index 871d088..b8ec25a 100644
+--- a/toolkit/components/resistfingerprinting/RFPTargetsDefault.inc
++++ b/toolkit/components/resistfingerprinting/RFPTargetsDefault.inc
+@@ -14,7 +14,6 @@ DESKTOP_DEFAULT(NavigatorHWConcurrencyTiered)
+ DESKTOP_DEFAULT(MaxTouchPointsCollapse)
+ DESKTOP_DEFAULT(IMEStyle)
+ 
+-#ifdef NIGHTLY_BUILD
+ // All WebGL Vendor targets are included; however
+ // Randomize overrides Constant which overrides Sanitize.
+ // We include them all so that relaxing one will still enforce the others
+@@ -25,7 +24,6 @@ DESKTOP_DEFAULT(WebGLVendorSanitize)
+ ANDROID_DEFAULT(WebGLRendererConstant)
+ ANDROID_DEFAULT(WebGLVendorConstant)
+ ANDROID_DEFAULT(WebGLVendorSanitize)
+-#endif
+ 
+ ANDROID_DEFAULT(CanvasRandomization)
+ ANDROID_DEFAULT(EfficientCanvasRandomization)
