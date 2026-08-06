@@ -18,3 +18,16 @@ index e5e517635d639..4482baba59699 100644
      nargs=1,
      help='Used for application.ini\'s "Profile" field, which controls profile location',
  )
+diff --git a/browser/moz.configure b/browser/moz.configure
+index 3ea3d88..79f6f6e 100644
+--- a/browser/moz.configure
++++ b/browser/moz.configure
+@@ -11,7 +11,7 @@ imply_option("MOZ_NORMANDY", True)
+ imply_option("MOZ_PROFILE_MIGRATOR", True)
+ 
+ 
+-imply_option("MOZ_APP_VENDOR", "Mozilla")
++imply_option("MOZ_APP_VENDOR", "LibreWolf")
+ imply_option("MOZ_APP_ID", "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}")
+ # Include the DevTools client, not just the server (which is the default)
+ imply_option("MOZ_DEVTOOLS", "all")
