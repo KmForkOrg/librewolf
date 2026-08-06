@@ -5,3 +5,6 @@ urlbar-webgl-notification-anchor =
     .tooltiptext = Manage WebGL context creation permission
 urlbar-webgl-blocked =
     .tooltiptext = You have blocked WebGL context creation for this website.
+post-update-info-button = Okay
+post-update-info-button-learn = Learn more
+post-update-info-message = Starting with this release, we have switched to using Nightly's FPP protections.

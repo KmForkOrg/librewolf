@@ -1,0 +1,93 @@
+diff --git a/browser/components/BrowserGlue.sys.mjs b/browser/components/BrowserGlue.sys.mjs
+index 8acc1e5..75f3223 100644
+--- a/browser/components/BrowserGlue.sys.mjs
++++ b/browser/components/BrowserGlue.sys.mjs
+@@ -962,6 +962,7 @@ BrowserGlue.prototype = {
+ 
+     lazy.Sanitizer.onStartup();
+     lazy.SessionWindowUI.maybeShowRestoreSessionInfoBar();
++    lazy.SessionWindowUI.maybeShowPostUpdateInfoBar();
+     this._scheduleStartupIdleTasks();
+     this._lateTasksIdleObserver = (idleService, topic) => {
+       if (topic == "idle") {
+diff --git a/browser/components/sessionstore/SessionWindowUI.sys.mjs b/browser/components/sessionstore/SessionWindowUI.sys.mjs
+index bbd8610..ad3e1a8 100644
+--- a/browser/components/sessionstore/SessionWindowUI.sys.mjs
++++ b/browser/components/sessionstore/SessionWindowUI.sys.mjs
+@@ -230,6 +230,76 @@ export var SessionWindowUI = {
+     // Don't allow it to be immediately hidden:
+     notification.timeout = Date.now() + 3000;
+   },
++  async maybeShowPostUpdateInfoBar() {
++    try {
++      if (Services.prefs.getIntPref("librewolf.startup.showPostUpdateInfoUser", 0) >= Services.prefs.getIntPref("librewolf.startup.showPostUpdateInfo", 0)) {
++        return;
++      }
++
++      let win = lazy.BrowserWindowTracker.getTopWindow({
++        allowFromInactiveWorkspace: true,
++      });
++      if (!win) {
++        return;
++      }
++
++      const notifyBox = win.gBrowser.getNotificationBox();
++      if (!notifyBox) {
++        return;
++      }
++
++      const messageFragment = win.document.createDocumentFragment();
++      const message = win.document.createElement("span");
++      const icon = win.document.createElement("img");
++      icon.src = "chrome://browser/skin/menu.svg";
++      icon.setAttribute("data-l10n-name", "icon");
++      icon.className = "inline-icon";
++      message.appendChild(icon);
++      messageFragment.appendChild(message);
++      win.document.l10n.setAttributes(message, "post-update-info-message");
++
++      const learnUrl = "https://librewolf.net/docs/faq/#why-is-rfp-no-longer-enabled-by-default";
++      const buttons = [
++        {
++          "l10n-id": "post-update-info-button",
++          primary: true,
++          callback: () => {},
++        },
++        {
++          "l10n-id": "post-update-info-button-learn",
++          callback: () => {
++            try {
++              const newTab = win.gBrowser.addTab(learnUrl, { triggeringPrincipal: win.document.nodePrincipal,});
++              win.gBrowser.selectedTab = newTab;
++            } catch (e) {
++              Cu.reportError(e);
++            }
++          },
++        },
++      ];
++
++      let notification;
++      try {
++        notification = await notifyBox.appendNotification(
++          "post-update-info-startup",
++          {
++            label: messageFragment,
++            priority: notifyBox.PRIORITY_INFO_MEDIUM,
++          },
++          buttons
++        );
++      } catch (e) {
++        Cu.reportError(e);
++        return;
++      }
++
++      notification.timeout = Date.now() + 3000;
++
++      Services.prefs.setIntPref("librewolf.startup.showPostUpdateInfoUser", Services.prefs.getIntPref("librewolf.startup.showPostUpdateInfo", 0));
++    } catch (e) {
++      Cu.reportError(e);
++    }
++  },
+ };
+ 
+ export class RestoreLastSessionObserver {
