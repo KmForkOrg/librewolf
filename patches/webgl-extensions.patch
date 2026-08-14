@@ -1,0 +1,32 @@
+diff --git a/dom/canvas/ClientWebGLContext.cpp b/dom/canvas/ClientWebGLContext.cpp
+index 131a739..a2b35ea 100644
+--- a/dom/canvas/ClientWebGLContext.cpp
++++ b/dom/canvas/ClientWebGLContext.cpp
+@@ -5957,9 +5957,14 @@ void ClientWebGLContext::GetSupportedExtensions(
+   retval.SetNull();
+   if (IsContextLost()) return;
+ 
++  const bool resistFingerprinting =
++    ShouldResistFingerprinting(RFPTarget::WebGLExtensions);
++
+   auto& retarr = retval.SetValue();
+   for (const auto i : MakeEnumeratedRange(WebGLExtensionID::Max)) {
+-    if (!IsSupported(i, callerType)) continue;
++    if (!resistFingerprinting && !IsSupported(i, callerType)) {
++      continue;
++    }
+ 
+     const auto& extStr = GetExtensionName(i);
+     retarr.AppendElement(NS_ConvertUTF8toUTF16(extStr));
+diff --git a/toolkit/components/resistfingerprinting/RFPTargets.inc b/toolkit/components/resistfingerprinting/RFPTargets.inc
+index 753ca2f..c573f82 100644
+--- a/toolkit/components/resistfingerprinting/RFPTargets.inc
++++ b/toolkit/components/resistfingerprinting/RFPTargets.inc
+@@ -112,6 +112,7 @@ ITEM_VALUE(WebGLVendorSanitize,         77)
+ ITEM_VALUE(WebGLVendorConstant,         78)
+ ITEM_VALUE(WebGLVendorRandomize,        79)
+ ITEM_VALUE(WebGLRendererConstant,       80)
++ITEM_VALUE(WebGLExtensions,             81)
+ 
+ // !!! Adding a new target? Rename PointerId and repurpose it.
+ 
