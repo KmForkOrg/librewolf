@@ -4,10 +4,96 @@ on:
   workflow_dispatch:
 
 jobs:
+  prepare:
+    runs-on: epsilon
+    container:
+      image: codeberg.org/librewolf/bsys6:dind
+    outputs:
+      version: ${{ steps.vars.outputs.VERSION }}
+      release: ${{ steps.vars.outputs.RELEASE }}
+      tag: ${{ steps.vars.outputs.TAG }}
+      is_beta: ${{ steps.vars.outputs.IS_BETA }}
+      lw_suffix: ${{ steps.vars.outputs.LW_SUFFIX }}
+      publish: ${{ steps.vars.outputs.PUBLISH }}
+      ff_version: ${{ steps.detect.outputs.FF_VERSION }}
+      ff_channel: ${{ steps.detect.outputs.FF_CHANNEL }}
+      ff_build: ${{ steps.detect.outputs.FF_BUILD }}
+      ff_beta_suffix: ${{ steps.detect.outputs.FF_BETA_SUFFIX }}
+      ff_display: ${{ steps.detect.outputs.FF_DISPLAY }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set variables
+        id: vars
+        run: |
+          set -euo pipefail
+
+          VERSION="$(cat version)"
+          RELEASE="$(cat release)"
+          TAG="${VERSION}-${RELEASE}"
+
+          # A beta release is cut from the beta branch; main cuts the stable one
+          if [ "${{ forgejo.ref }}" = "refs/heads/beta" ]; then
+            IS_BETA=true
+            LW_SUFFIX="-beta"
+            TAG="${TAG}${LW_SUFFIX}"
+          else
+            IS_BETA=false
+            LW_SUFFIX=""
+          fi
+
+          if [ "${{ forgejo.ref }}" = "refs/heads/main" ] || [ "${IS_BETA}" = "true" ]; then
+            PUBLISH=true
+          else
+            PUBLISH=false
+          fi
+
+          {
+            echo "VERSION=${VERSION}"
+            echo "RELEASE=${RELEASE}"
+            echo "TAG=${TAG}"
+            echo "IS_BETA=${IS_BETA}"
+            echo "LW_SUFFIX=${LW_SUFFIX}"
+            echo "PUBLISH=${PUBLISH}"
+          } >> $FORGEJO_OUTPUT
+
+      - name: Detect Firefox Version
+        id: detect
+        run: |
+          set -euo pipefail
+
+          chmod +x ./scripts/detect-firefox-version.sh
+          ./scripts/detect-firefox-version.sh --version "${{ steps.vars.outputs.VERSION }}" >> $FORGEJO_OUTPUT
+
+          # Read outputs
+          while IFS='=' read -r key value; do
+            export "$key=$value"
+          done < $FORGEJO_OUTPUT
+
+          echo "========================================"
+          echo "Firefox Version:"
+          echo "========================================"
+          echo "Version:     $FF_VERSION"
+          echo "Channel:     $FF_CHANNEL"
+          echo "Build:       $FF_BUILD"
+          echo "Beta Suffix: $FF_BETA_SUFFIX"
+          echo "Display:     $FF_DISPLAY"
+          echo "========================================"
+
+          # Ensure we do no fallback release
+          if [ "$FF_VERSION" != "${{ steps.vars.outputs.VERSION }}" ]; then
+            echo "Resolved Firefox ${FF_VERSION}, but ./version says ${{ steps.vars.outputs.VERSION }}" >&2
+            exit 1
+          fi
+
   build-source:
     runs-on: epsilon
     container:
       image: codeberg.org/librewolf/bsys6:dind
+    needs: [prepare]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -16,9 +102,12 @@ jobs:
 
       - name: Make LibreWolf source archive
         env:
-            SIGNING_KEY: ${{ forgejo.ref == 'refs/heads/main' && secrets.SIGNING_KEY || '' }}
+            SIGNING_KEY: ${{ needs.prepare.outputs.publish == 'true' && secrets.SIGNING_KEY || '' }}
         run: |
-          make all
+          make all LW_SUFFIX=${{ needs.prepare.outputs.lw_suffix }} \
+                   FF_CHANNEL=${{ needs.prepare.outputs.ff_channel }} \
+                   FF_BUILD=${{ needs.prepare.outputs.ff_build || 'build1' }} \
+                   FF_BETA_SUFFIX=${{ needs.prepare.outputs.ff_beta_suffix }}
 
       - name: Upload artifacts
         uses: https://data.forgejo.org/forgejo/upload-artifact@v4
@@ -34,64 +123,77 @@ jobs:
 
   publish-release:
     runs-on: epsilon
-    if: forgejo.ref == 'refs/heads/main'
+    if: needs.prepare.outputs.publish == 'true'
     container:
       image: codeberg.org/librewolf/bsys6:dind
-    needs: [build-source]
+    needs: [prepare, build-source]
+    env:
+      TAG: ${{ needs.prepare.outputs.tag }}
+      IS_BETA: ${{ needs.prepare.outputs.is_beta }}
+      FF_DISPLAY: ${{ needs.prepare.outputs.ff_display }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
       - name: Download artifacts
         uses: https://data.forgejo.org/forgejo/download-artifact@v4
         with:
           merge-multiple: true
 
-      - name: Set variables
-        id: version
-        run: |
-          echo "VERSION=$(cat version)" >> $FORGEJO_OUTPUT
-          echo "RELEASE=$(cat release)" >> $FORGEJO_OUTPUT
-          echo "BUILD_JOB_ID=$FORGEJO_RUN_NUMBER" >> $FORGEJO_OUTPUT
-
       - name: Upload to Package Registry
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
+          set -euo pipefail
+
           if [ -z "$SIGNING_KEY" ]; then
             echo "SIGNING_KEY is not defined; don't publish an unsigned release" >&2
             exit 1
           fi
 
+          ARCHIVE="librewolf-${TAG}.source.tar.gz"
+
           FILES=(
-            "librewolf-${{ steps.version.outputs.VERSION }}-${{ steps.version.outputs.RELEASE }}.source.tar.gz"
-            "librewolf-${{ steps.version.outputs.VERSION }}-${{ steps.version.outputs.RELEASE }}.source.tar.gz.sha256sum"
-            "librewolf-${{ steps.version.outputs.VERSION }}-${{ steps.version.outputs.RELEASE }}.source.tar.gz.sha512sum"
+            "${ARCHIVE}"
+            "${ARCHIVE}.sha256sum"
+            "${ARCHIVE}.sha512sum"
           )
 
           if [[ -n "$SIGNING_KEY" ]]; then
-            FILES+=("librewolf-${{ steps.version.outputs.VERSION }}-${{ steps.version.outputs.RELEASE }}.source.tar.gz.sig")
+            FILES+=("${ARCHIVE}.sig")
           fi
 
           for FILE in "${FILES[@]}"; do
-            curl --http1.1 --user "${{ vars.FORGE_USER }}:${{ secrets.FORGE_TOKEN }}" --upload-file "${FILE}" "${{ forgejo.server_url }}/api/packages/${{ forgejo.repository_owner }}/generic/librewolf-source/${{ steps.version.outputs.VERSION }}-${{ steps.version.outputs.RELEASE }}/${FILE}" >&2
+            curl --http1.1 --user "${{ vars.FORGE_USER }}:${{ secrets.FORGE_TOKEN }}" --upload-file "${FILE}" "${{ forgejo.server_url }}/api/packages/${{ forgejo.repository_owner }}/generic/librewolf-source/${TAG}/${FILE}" >&2
           done
 
       - name: Create Release
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
-          TAG="${{ steps.version.outputs.VERSION }}-${{ steps.version.outputs.RELEASE }}"
+          set -euo pipefail
+
           PACKAGE_BASE="${{ forgejo.server_url }}/api/packages/${{ forgejo.repository_owner }}/generic/librewolf-source/${TAG}"
+          ARCHIVE="librewolf-${TAG}.source.tar.gz"
+          RUN_URL="${{ forgejo.server_url }}/${{ forgejo.repository }}/actions/runs/${{ forgejo.run_number }}"
+
+          if [ "${IS_BETA}" = "true" ]; then
+            NAME="LibreWolf Source v${TAG}"
+            NOTES=$(printf '## LibreWolf Beta Source Release v%s\n\nBuilt from %s.\n\nThis is a beta release, cut from the `beta` branch ahead of the stable release. Please report anything that breaks.\n\nBuilt on Codeberg by workflow [#%s](%s)' \
+              "${TAG}" "${FF_DISPLAY}" "${{ forgejo.run_number }}" "${RUN_URL}")
+            PRERELEASE=true
+          else
+            NAME="LibreWolf Source v${TAG}"
+            NOTES=$(printf '## LibreWolf Source Release v%s\n\nBuilt on Codeberg by workflow [#%s](%s)' \
+              "${TAG}" "${{ forgejo.run_number }}" "${RUN_URL}")
+            PRERELEASE=false
+          fi
 
           # Create release
           body=$(jq -n \
             --arg tag "$TAG" \
-            --arg name "LibreWolf Source v${TAG}" \
-            --arg body $'## LibreWolf Source Release v'"${TAG}"$'\n\nBuilt on Codeberg by workflow [#${{ forgejo.run_number }}](${{ forgejo.server_url }}/${{ forgejo.repository }}/actions/runs/${{ forgejo.run_number }})' \
-            '{tag_name: $tag, name: $name, body: $body, draft: false, prerelease: false}')
+            --arg target "${{ forgejo.sha }}" \
+            --arg name "$NAME" \
+            --arg body "$NOTES" \
+            --argjson prerelease "$PRERELEASE" \
+            '{tag_name: $tag, target_commitish: $target, name: $name, body: $body, draft: false, prerelease: $prerelease}')
 
           release_id=$(curl --fail-with-body --header 'Content-Type: application/json' \
             --header 'accept: application/json' \
@@ -104,13 +206,13 @@ jobs:
 
           # Add external URL assets
           FILES=(
-            "librewolf-${TAG}.source.tar.gz"
-            "librewolf-${TAG}.source.tar.gz.sha256sum"
-            "librewolf-${TAG}.source.tar.gz.sha512sum"
+            "${ARCHIVE}"
+            "${ARCHIVE}.sha256sum"
+            "${ARCHIVE}.sha512sum"
           )
 
           if [[ -n "$SIGNING_KEY" ]]; then
-            FILES+=("librewolf-${TAG}.source.tar.gz.sig")
+            FILES+=("${ARCHIVE}.sig")
           fi
 
           for FILE in "${FILES[@]}"; do

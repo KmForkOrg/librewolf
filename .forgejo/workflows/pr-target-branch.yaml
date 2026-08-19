@@ -1,0 +1,69 @@
+name: Check PR Target Branch
+
+on:
+  pull_request_target:
+    types:
+      - opened
+
+jobs:
+  close-external-pr:
+    # Only act on PRs aimed at main that come from a fork
+    if: >-
+      forgejo.event.pull_request.base.ref == 'main' &&
+      forgejo.event.pull_request.head.repo.full_name != forgejo.repository
+    runs-on: epsilon
+    container:
+      image: codeberg.org/librewolf/bsys6:dind
+    env:
+      API: ${{ forgejo.server_url }}/api/v1
+      REPO: ${{ forgejo.repository }}
+      TOKEN: ${{ secrets.FORGE_TOKEN }}
+      PR_NUMBER: ${{ forgejo.event.pull_request.number }}
+      PR_AUTHOR: ${{ forgejo.event.pull_request.user.login }}
+      HEAD_REF: ${{ forgejo.event.pull_request.head.ref }}
+    steps:
+      - name: Explain and close the pull request
+        run: |
+          set -euo pipefail
+
+          read -r -d '' MESSAGE <<MSG || true
+          Thanks for the contribution, @${PR_AUTHOR}!
+
+          This pull request targets \`main\`, but contributions have to go to the **\`beta\`** branch first. \`main\` only ever receives merges from \`beta\` when a release is cut, so a PR against it cannot be merged.
+
+          This PR will now be closed, but don't worry, your commits are still on your branch. Here is how to move the work over.
+
+          If your branch was based on \`main\`, rebase it onto \`beta\` first:
+
+          \`\`\`bash
+          git remote add upstream ${{ forgejo.server_url }}/${{ forgejo.repository }}.git   # skip if you already have it
+          git fetch upstream beta main
+
+          git switch ${HEAD_REF}
+          git rebase --onto upstream/beta \$(git merge-base HEAD upstream/main)
+
+          git push --force-with-lease origin ${HEAD_REF}
+          \`\`\`
+
+          Then open a new pull request with **base branch \`beta\`**. Sorry for the extra step, and thanks again!
+          MSG
+
+          body=$(jq -n --arg body "${MESSAGE}" '{body: $body}')
+
+          curl --fail-with-body -s -o /dev/null \
+            --header 'Content-Type: application/json' \
+            --header 'accept: application/json' \
+            --header "Authorization: token ${TOKEN}" \
+            --data "${body}" \
+            --request POST \
+            "${API}/repos/${REPO}/issues/${PR_NUMBER}/comments"
+
+          curl --fail-with-body -s -o /dev/null \
+            --header 'Content-Type: application/json' \
+            --header 'accept: application/json' \
+            --header "Authorization: token ${TOKEN}" \
+            --data '{"state": "closed"}' \
+            --request PATCH \
+            "${API}/repos/${REPO}/issues/${PR_NUMBER}"
+
+          echo "Closed PR #${PR_NUMBER} from ${PR_AUTHOR}"

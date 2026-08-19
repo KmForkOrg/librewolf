@@ -147,6 +147,16 @@ Here is the current translation status:
 
 ## Development
 
+### Development: The beta branch
+
+All changes go through `beta` first,
+so please open your pull requests against that branch and not `main`.
+
+A couple days before the regular release date we do a beta release,
+built from the Firefox RC and whatever has landed in `beta` since the last one.
+If it holds up and we don't get reports of anything broken,
+`beta` is merged into `main` and the stable release goes out together with Firefox stable.
+
 ### Development: Creating a patch
 
 The easiest way to make patches is to go to the LibreWolf source folder:

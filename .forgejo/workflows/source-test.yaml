@@ -54,7 +54,11 @@ jobs:
         id: detect
         run: |
           chmod +x ./scripts/detect-firefox-version.sh
-          ./scripts/detect-firefox-version.sh --channel "${{ (github.ref == 'refs/heads/beta' || github.base_ref == 'beta') && 'latest' || inputs.Version || 'stable' }}" >> $FORGEJO_OUTPUT
+          if [ -n "${{ inputs.Version }}" ]; then
+            ./scripts/detect-firefox-version.sh --channel "${{ inputs.Version }}" >> $FORGEJO_OUTPUT
+          else
+            ./scripts/detect-firefox-version.sh --version "$(cat version)" >> $FORGEJO_OUTPUT
+          fi
 
           # Read outputs
           while IFS='=' read -r key value; do
@@ -86,13 +90,14 @@ jobs:
 
       - name: Fetching Firefox Source
         run: |
-          make fetch FF_CHANNEL=${{ needs.detect-version.outputs.ff_channel }} \
+          make fetch version=${{ needs.detect-version.outputs.ff_version }} \
+                     FF_CHANNEL=${{ needs.detect-version.outputs.ff_channel }} \
                      FF_BUILD=${{ needs.detect-version.outputs.ff_build || 'build1' }} \
                      FF_BETA_SUFFIX=${{ needs.detect-version.outputs.ff_beta_suffix }}
 
       - name: Test Build
         run: |
-          make test-linux
+          make test-linux version=${{ needs.detect-version.outputs.ff_version }}
 
       - name: Upload artifacts
         uses: https://data.forgejo.org/forgejo/upload-artifact@v4
@@ -118,13 +123,14 @@ jobs:
 
       - name: Fetching Firefox Source
         run: |
-          make fetch FF_CHANNEL=${{ needs.detect-version.outputs.ff_channel }} \
+          make fetch version=${{ needs.detect-version.outputs.ff_version }} \
+                     FF_CHANNEL=${{ needs.detect-version.outputs.ff_channel }} \
                      FF_BUILD=${{ needs.detect-version.outputs.ff_build || 'build1' }} \
                      FF_BETA_SUFFIX=${{ needs.detect-version.outputs.ff_beta_suffix }}
 
       - name: Test Build
         run: |
-          make test-windows
+          make test-windows version=${{ needs.detect-version.outputs.ff_version }}
 
       - name: Upload artifacts
         uses: https://data.forgejo.org/forgejo/upload-artifact@v4
@@ -150,13 +156,14 @@ jobs:
 
       - name: Fetching Firefox Source
         run: |
-          make fetch FF_CHANNEL=${{ needs.detect-version.outputs.ff_channel }} \
+          make fetch version=${{ needs.detect-version.outputs.ff_version }} \
+                     FF_CHANNEL=${{ needs.detect-version.outputs.ff_channel }} \
                      FF_BUILD=${{ needs.detect-version.outputs.ff_build || 'build1' }} \
                      FF_BETA_SUFFIX=${{ needs.detect-version.outputs.ff_beta_suffix }}
 
       - name: Test Build
         run: |
-          make test-macos
+          make test-macos version=${{ needs.detect-version.outputs.ff_version }}
 
       - name: Upload artifacts
         uses: https://data.forgejo.org/forgejo/upload-artifact@v4

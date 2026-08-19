@@ -6,6 +6,10 @@ testing_targets = full-test test test-linux test-macos test-windows
 version := $(shell cat ./version)
 release := $(shell cat ./release)
 
+# Optional suffix for non-stable releases
+LW_SUFFIX ?=
+lw_release := $(release)$(LW_SUFFIX)
+
 FF_BASE_URL ?= https://archive.mozilla.org/pub/firefox/releases
 FF_CHANNEL ?= releases
 FF_BUILD ?= build1
@@ -33,14 +37,14 @@ ext := .tar.gz
 ff_source_dir := firefox-$(version)
 ff_source_tarball := firefox-$(version).source.tar.xz
 
-lw_source_dir := librewolf-$(version)-$(release)
-lw_source_tarball := librewolf-$(version)-$(release).source$(ext)
+lw_source_dir := librewolf-$(version)-$(lw_release)
+lw_source_tarball := librewolf-$(version)-$(lw_release).source$(ext)
 
 help:
 
 	@echo "use: $(MAKE) [all] [check] [clean] [veryclean] [bootstrap] [build] [package] [run]"
 	@echo ""
-	@echo "  all         - Make LibreWolf source archive ${version}-${release}."
+	@echo "  all         - Make LibreWolf source archive ${version}-${lw_release}."
 	@echo ""
 	@echo "  check       - Check if there is a new version of Firefox."
 	@echo "  update      - Update the git submodules."
@@ -137,12 +141,12 @@ $(lw_source_dir): $(ff_source_tarball) ./version ./release scripts/librewolf-pat
 	rm -rf $(ff_source_dir) $(lw_source_dir)
 	tar xf $(ff_source_tarball)
 	mv $(ff_source_dir) $(lw_source_dir)
-	python3 scripts/librewolf-patches.py $(version) $(release)
+	python3 scripts/librewolf-patches.py $(version) $(lw_release)
 
 $(lw_source_tarball): $(lw_source_dir)
 	rm -f $(lw_source_tarball)
-	tar cf librewolf-$(version)-$(release).source.tar $(lw_source_dir)
-	pigz -6 librewolf-$(version)-$(release).source.tar
+	tar cf librewolf-$(version)-$(lw_release).source.tar $(lw_source_dir)
+	pigz -6 librewolf-$(version)-$(lw_release).source.tar
 	touch $(lw_source_dir)
 	sha256sum $(lw_source_tarball) > $(lw_source_tarball).sha256sum
 	cat $(lw_source_tarball).sha256sum
@@ -170,7 +174,7 @@ build: $(lw_source_dir)
 
 package:
 	(cd $(lw_source_dir) && cat browser/locales/shipped-locales | xargs ./mach package-multi-locale --locales)
-	cp -v $(lw_source_dir)/obj-*/dist/librewolf-$(version)-$(release).en-US.*.tar.xz .
+	cp -v $(lw_source_dir)/obj-*/dist/librewolf-$(version)-$(lw_release).en-US.*.tar.xz .
 
 run:
 	(cd $(lw_source_dir) && ./mach run)

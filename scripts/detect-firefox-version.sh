@@ -8,12 +8,19 @@
 set -e
 
 CHANNEL="latest"
+TARGET_VERSION=""
+MODE="channel"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
         --channel)
             CHANNEL="$2"
+            shift 2
+            ;;
+        --version)
+            TARGET_VERSION="$2"
+            MODE="version"
             shift 2
             ;;
         *)
@@ -105,6 +112,27 @@ find_rc() {
     echo ""
 }
 
+# Find where a given version can be fetched from
+resolve_version() {
+    local version="$1"
+    local build
+
+    if url_exists "${RELEASES_URL}/${version}/source/firefox-${version}.source.tar.xz"; then
+        output_result "$version" "releases" "" "" "Firefox ${version} (Stable)"
+        return 0
+    fi
+
+    # Not released, so look for an RC
+    build=$(find_latest_build "$version")
+    if [[ -n "$build" ]] \
+        && url_exists "${CANDIDATES_URL}/${version}-candidates/${build}/source/firefox-${version}.source.tar.xz"; then
+        output_result "$version" "candidates" "$build" "" "Firefox ${version} (RC, ${build})"
+        return 0
+    fi
+
+    return 1
+}
+
 # Output results
 output_result() {
     local version="$1"
@@ -119,6 +147,23 @@ output_result() {
     echo "FF_BETA_SUFFIX=${beta_suffix}"
     echo "FF_DISPLAY=${display}"
 }
+
+# Version mode
+if [[ "$MODE" == "version" ]]; then
+    echo "Resolving Firefox ${TARGET_VERSION}..." >&2
+    if resolve_version "$TARGET_VERSION"; then
+        exit 0
+    fi
+
+    # Not out yet, which is normal for most of a cycle
+    echo "Firefox ${TARGET_VERSION} is not out yet, falling back to ${STABLE_VERSION}" >&2
+    if resolve_version "$STABLE_VERSION"; then
+        exit 0
+    fi
+
+    echo "Error: could not resolve ${TARGET_VERSION} or ${STABLE_VERSION}" >&2
+    exit 1
+fi
 
 # Main selecton based on channel
 case "$CHANNEL" in
