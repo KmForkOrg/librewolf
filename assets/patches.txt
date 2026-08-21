@@ -12,10 +12,12 @@ patches/extensions-setUninstallURL.patch
 patches/firefox-in-ua.patch
 patches/fpp-canvas-fix.patch
 patches/fullpage-translations-customization.patch
+patches/include-policy-deletion.patch
 patches/languages.patch
 patches/limit-access.patch
 patches/link-preview.patch
 patches/lw-permissions.patch
+patches/macos-relaunch-without-updater.patch
 patches/moz-configure.patch
 patches/mozilla_dirs.patch
 patches/moz-official.patch
@@ -28,7 +30,6 @@ patches/remove-pingsender.patch
 patches/rs-blocker.patch
 patches/rust-gentoo-musl.patch
 patches/temp-macos-fix.patch
-patches/macos-relaunch-without-updater.patch
 patches/ui-patches/add-translate-page-context-menu.patch
 patches/ui-patches/allow_cookies_for_site.patch
 patches/ui-patches/backport-wallpapers.patch
