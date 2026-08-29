@@ -15,6 +15,7 @@ patches/firefox-in-ua.patch
 patches/fpp-canvas-fix.patch
 patches/fullpage-translations-customization.patch
 patches/languages.patch
+patches/language-fallback.patch
 patches/limit-access.patch
 patches/link-preview.patch
 patches/lw-permissions.patch

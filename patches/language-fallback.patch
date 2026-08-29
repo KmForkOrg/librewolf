@@ -1,0 +1,21 @@
+diff --git a/intl/locale/LocaleService.cpp b/intl/locale/LocaleService.cpp
+index d1721d1..ca82874 100644
+--- a/intl/locale/LocaleService.cpp
++++ b/intl/locale/LocaleService.cpp
+@@ -138,15 +138,10 @@ LocaleService::LocaleService(bool aIsServer) : mIsServer(aIsServer) {}
+  */
+ void LocaleService::NegotiateAppLocales(nsTArray<nsCString>& aRetVal) {
+   if (mIsServer) {
+-    nsAutoCString defaultLocale;
+-    AutoTArray<nsCString, 100> availableLocales;
+     AutoTArray<nsCString, 10> requestedLocales;
+-    GetDefaultLocale(defaultLocale);
+-    GetAvailableLocales(availableLocales);
+     GetRequestedLocales(requestedLocales);
+ 
+-    NegotiateLanguages(requestedLocales, availableLocales, defaultLocale,
+-                       kLangNegStrategyFiltering, aRetVal);
++    aRetVal = requestedLocales.Clone();
+   }
+ 
+   nsAutoCString lastFallbackLocale;
