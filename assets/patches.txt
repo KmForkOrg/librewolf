@@ -13,6 +13,7 @@ patches/extensions-setUninstallURL.patch
 patches/firefox-in-ua.patch
 patches/fpp-canvas-fix.patch
 patches/fullpage-translations-customization.patch
+patches/include-policy-deletion.patch
 patches/languages.patch
 patches/limit-access.patch
 patches/link-preview.patch
@@ -32,7 +33,7 @@ patches/rs-blocker.patch
 patches/rust-gentoo-musl.patch
 patches/strip-dash-from-compare.patch
 patches/temp-macos-fix.patch
-patches/macos-relaunch-without-updater.patch
+patches/updater.patch
 patches/ui-patches/add-translate-page-context-menu.patch
 patches/ui-patches/allow_cookies_for_site.patch
 patches/ui-patches/home-preferences.patch
