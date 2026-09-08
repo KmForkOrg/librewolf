@@ -87,23 +87,23 @@ index 783c67d..071f294 100644
  # L10n resources and overrides.
  % override chrome://global/locale/appstrings.properties chrome://browser/locale/appstrings.properties
 diff --git a/browser/components/ProfileDataUpgrader.sys.mjs b/browser/components/ProfileDataUpgrader.sys.mjs
-index 6b0e225..9c7923a 100644
+index ca6f1f6..179fa8f 100644
 --- a/browser/components/ProfileDataUpgrader.sys.mjs
 +++ b/browser/components/ProfileDataUpgrader.sys.mjs
-@@ -1078,6 +1078,16 @@ export let ProfileDataUpgrader = {
-       Services.prefs.clearUserBranch("browser.promo.cookiebanners.");
+@@ -1087,6 +1087,16 @@ export let ProfileDataUpgrader = {
+       if (!Services.prefs.prefHasUserValue(IPP_HAS_SEEN_FEATURE_PREF)) {
+         Services.prefs.setBoolPref(IPP_HAS_SEEN_FEATURE_PREF, true);
+       }
++
++      const DOH_NOTIFICATION_PREF = "librewolf.migration.show_doh_notification";
++      const DOH_URI_PREF = "network.trr.uri";
++      const MULLVAD_DNS = "https://dns.mullvad.net/dns-query";
++      const QUAD9_DNS = "https://dns10.quad9.net/dns-query"
++
++      if (Services.prefs.getStringPref(DOH_URI_PREF, "") === MULLVAD_DNS) {
++        Services.prefs.setStringPref(DOH_URI_PREF, QUAD9_DNS);
++        Services.prefs.setBoolPref(DOH_NOTIFICATION_PREF, true);
++      }
      }
  
-+    const DOH_NOTIFICATION_PREF = "librewolf.migration.show_doh_notification";
-+    const DOH_URI_PREF = "network.trr.uri";
-+    const MULLVAD_DNS = "https://dns.mullvad.net/dns-query";
-+    const QUAD9_DNS = "https://dns10.quad9.net/dns-query"
-+
-+    if (Services.prefs.getStringPref(DOH_URI_PREF, "") === MULLVAD_DNS) {
-+      Services.prefs.setStringPref(DOH_URI_PREF, QUAD9_DNS);
-+      Services.prefs.setBoolPref(DOH_NOTIFICATION_PREF, true);
-+    }
-+
-     // Update the migration version.
-     Services.prefs.setIntPref("browser.migration.version", newVersion);
-   },
+     if (existingDataVersion < 181) {
