@@ -7,6 +7,6 @@ urlbar-webgl-blocked =
     .tooltiptext = You have blocked WebGL context creation for this website.
 
 # Mullvad DNS Migration
-mullvad-doh-notification-body = <strong>Your default DNS Over HTTPS settings have been changed.</strong> Mullvad secure DNS service is being discontinued.
+mullvad-doh-notification-body = Mullvad Secure DNS is being <strong>discontinued</strong>. Your DNS over HTTPS service has been changed to <strong>Quad9 (No Filtering)</strong>. Please review these settings now.
 mullvad-doh-notification-settings-button =
     .label = Review settings
