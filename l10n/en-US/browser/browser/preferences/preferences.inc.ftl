@@ -56,6 +56,9 @@ librewolf-goog-safe-checkbox =
     .label = Enable Google Safe Browsing
 librewolf-goog-safe-download-checkbox =
     .label = Scan downloads
+librewolf-phoenix-enabled-checkbox2 =
+    .label = Enable the Phoenix configuration suite
+    .description = Phoenix is a suite of configurations & advanced modifications, designed to put the user first - with a focus on privacy, security, freedom, functionality, & usability
 # In-depth descriptions
 librewolf-ocsp-description = Prevent connecting to a website if the OCSP check cannot be performed.
 librewolf-ocsp-warning1 = This increases security, but it will cause breakage when an OCSP server is down.
