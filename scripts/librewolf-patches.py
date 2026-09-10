@@ -127,6 +127,14 @@ def librewolf_patches():
     # vs_pack.py issue... should be temporary
     exec('cp -v ../patches/pack_vs.py build/vs/')
 
+    # Add Phoenix to our config file
+    exec('curl -qfA "" --no-sessionid --proto =https --tlsv1.2 https://releases.celenity.dev/phoenix/releases/2026.09.01.1/universal/phoenix-2026.09.01.1-universal.cfg -o phoenix.cfg')
+    exec('echo "033bb3a25861ea052019abf4b6d16894d4a979c081aeb9f6423634ca7731cc98d93a19e8d3a7b9c81ef1f445527e21d26a707d691635369998ad70e923a877cc phoenix.cfg" | sha512sum -c -')
+    exec('sed -i "s/^/    /" phoenix.cfg')
+    exec('sed -i "/\/\/ Phoenix placeholder/r phoenix.cfg" ../settings/librewolf.cfg')
+    exec('sed -i "/\/\/ Phoenix placeholder/d" ../settings/librewolf.cfg')
+    exec('rm phoenix.cfg')
+
     #
     # Apply most recent `settings` repository files.
     #
