@@ -27,6 +27,7 @@ patches/msix.patch
 patches/newtab-fix.patch
 patches/pip-hide.patch
 patches/pip-hide-ui.patch
+patches/policy-merge.patch
 patches/profile-directory.patch
 patches/refresh.patch
 patches/remote-debugging-package-name.patch

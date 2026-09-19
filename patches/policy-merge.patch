@@ -1,0 +1,148 @@
+diff --git a/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs b/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
+index 27cc2bf7e7..91644fb12d 100644
+--- a/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
++++ b/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
+@@ -752,17 +752,23 @@ class JSONPoliciesProvider extends PoliciesProvider {
+     this._readData();
+   }
+ 
+-  _getLocalConfigurationFile() {
++  _getLocalConfigurationFiles() {
+     if (shouldIgnoreLocalPolicies()) {
+-      return null;
++      return [];
+     }
+ 
++    let configFiles = [];
++
+     if (AppConstants.platform == "linux" && AppConstants.MOZ_SYSTEM_POLICIES) {
+-      let systemConfigFile = Services.dirsvc.get("SysConfD", Ci.nsIFile);
+-      systemConfigFile.append("policies");
+-      systemConfigFile.append(POLICIES_FILENAME);
+-      if (systemConfigFile.exists()) {
+-        return systemConfigFile;
++      try {
++        let systemConfigFile = Services.dirsvc.get("SysConfD", Ci.nsIFile);
++        systemConfigFile.append("policies");
++        systemConfigFile.append(POLICIES_FILENAME);
++        if (systemConfigFile.exists()) {
++          configFiles.push(systemConfigFile);
++        }
++      } catch (ex) {
++        // No file found
+       }
+     }
+ 
+@@ -775,12 +781,14 @@ class JSONPoliciesProvider extends PoliciesProvider {
+         configFile = Services.dirsvc.get("XREAppDist", Ci.nsIFile);
+       }
+       configFile.append(POLICIES_FILENAME);
+-      return configFile;
++      if (configFile.exists()) {
++        configFiles.push(configFile);
++      }
+     } catch (ex) {
+-      // Getting the correct directory will fail in xpcshell tests. This should
+-      // be handled the same way as if the configFile simply does not exist.
+-      return null;
++      // No file found
+     }
++
++    return configFiles;
+   }
+ 
+   _getConfigurationFile() {
+@@ -820,38 +828,68 @@ class JSONPoliciesProvider extends PoliciesProvider {
+     return configFile;
+   }
+ 
++  _mergePolicies(target, source) {
++    for (let key in source) {
++      if (!source.hasOwnProperty(key)) {
++        continue;
++      }
++
++      const isPlainObject = obj =>
++        obj && typeof obj === "object" && !Array.isArray(obj);
++
++      if (isPlainObject(source[key]) && isPlainObject(target[key])) {
++        this._mergePolicies(target[key], source[key]);
++      } else {
++        target[key] = source[key];
++      }
++    }
++
++    return target;
++  }
++
+   _readData() {
+-    let configFile = this._getConfigurationFile();
+-    if (!configFile) {
++    let configFiles = this._getLocalConfigurationFiles();
++    if (!configFiles.length) {
+       // Do nothing, _policies will remain null
+       return;
+     }
+-    try {
+-      let data = Cu.readUTF8File(configFile);
+-      if (data) {
+-        lazy.log.debug(`policies.json path = ${configFile.path}`);
+-        lazy.log.debug(`policies.json content = ${data}`);
+-        this._policies = JSON.parse(data).policies;
+-
+-        if (!this._policies) {
+-          lazy.log.error("Policies file doesn't contain a 'policies' object");
+-          this._policies = null;
++
++    this._policies = {};
++
++    for (let configFile of configFiles) {
++      try {
++        let data = Cu.readUTF8File(configFile);
++        if (data) {
++          lazy.log.debug(`policies.json path = ${configFile.path}`);
++          lazy.log.debug(`policies.json content = ${data}`);
++
++          let parsed = JSON.parse(data).policies;
++          if (!parsed) {
++            lazy.log.error("Policies file doesn't contain a 'policies' object");
++            this._failed = true;
++            continue;
++          }
++
++          this._mergePolicies(this._policies, parsed);
++        }
++      } catch (ex) {
++        if (
++          ex instanceof Components.Exception &&
++          ex.result == Cr.NS_ERROR_FILE_NOT_FOUND
++        ) {
++          // Do nothing, continue to next file
++        } else if (ex instanceof SyntaxError) {
++          lazy.log.error(`Error parsing JSON file: ${ex}`);
++          this._failed = true;
++        } else {
++          lazy.log.error(`Error reading JSON file: ${ex}`);
+           this._failed = true;
+         }
+       }
+-    } catch (ex) {
+-      if (
+-        ex instanceof Components.Exception &&
+-        ex.result == Cr.NS_ERROR_FILE_NOT_FOUND
+-      ) {
+-        // Do nothing, _policies will remain null
+-      } else if (ex instanceof SyntaxError) {
+-        lazy.log.error(`Error parsing JSON file: ${ex}`);
+-        this._failed = true;
+-      } else {
+-        lazy.log.error(`Error reading JSON file: ${ex}`);
+-        this._failed = true;
+-      }
++    }
++
++    if (!Object.keys(this._policies).length) {
++      this._policies = null;
+     }
+   }
+ }
