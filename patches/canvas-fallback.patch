@@ -1,0 +1,51 @@
+diff --git a/dom/canvas/CanvasUtils.cpp b/dom/canvas/CanvasUtils.cpp
+index 17bfd46974..93eab6cfc2 100644
+--- a/dom/canvas/CanvasUtils.cpp
++++ b/dom/canvas/CanvasUtils.cpp
+@@ -383,16 +383,12 @@ ImageExtraction ImageExtractionResult(dom::HTMLCanvasElement* aCanvasElement,
+   }
+ 
+   if (ownerDoc->ShouldResistFingerprinting(
+-          RFPTarget::EfficientCanvasRandomization) &&
+-      GetCanvasExtractDataPermission(aPrincipal) !=
+-          nsIPermissionManager::ALLOW_ACTION) {
++          RFPTarget::EfficientCanvasRandomization)) {
+     return ImageExtraction::EfficientRandomize;
+   }
+ 
+   if ((ownerDoc->ShouldResistFingerprinting(RFPTarget::CanvasRandomization) ||
+-       ownerDoc->ShouldResistFingerprinting(RFPTarget::WebGLRandomization)) &&
+-      GetCanvasExtractDataPermission(aPrincipal) !=
+-          nsIPermissionManager::ALLOW_ACTION) {
++       ownerDoc->ShouldResistFingerprinting(RFPTarget::WebGLRandomization))) {
+     return ImageExtraction::Randomize;
+   }
+ 
+@@ -546,11 +542,6 @@ ImageExtraction ImageExtractionResult(dom::OffscreenCanvas* aOffscreenCanvas,
+     return ImageExtraction::Placeholder;
+   }
+ 
+-  if (GetCanvasExtractDataPermission(aPrincipal) ==
+-      nsIPermissionManager::ALLOW_ACTION) {
+-    return ImageExtraction::Unrestricted;
+-  }
+-
+   if (aOffscreenCanvas->ShouldResistFingerprinting(
+           RFPTarget::EfficientCanvasRandomization)) {
+     return ImageExtraction::EfficientRandomize;
+diff --git a/toolkit/components/resistfingerprinting/nsRFPService.cpp b/toolkit/components/resistfingerprinting/nsRFPService.cpp
+index 6ce393b112..c154a1883e 100644
+--- a/toolkit/components/resistfingerprinting/nsRFPService.cpp
++++ b/toolkit/components/resistfingerprinting/nsRFPService.cpp
+@@ -1885,11 +1885,6 @@ nsresult nsRFPService::RandomizeElements(
+     return NS_OK;
+   }
+ 
+-  if (aPrincipal && CanvasUtils::GetCanvasExtractDataPermission(aPrincipal) ==
+-                        nsIPermissionManager::ALLOW_ACTION) {
+-    return NS_OK;
+-  }
+-
+   // Don't randomize if all groups are uniform.
+   const bool allGroupsMatch = [&]() {
+     auto itr = RangedPtr<const uint8_t>(aData, aSizeInBytes);
