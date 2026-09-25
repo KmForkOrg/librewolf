@@ -1,57 +1,72 @@
 diff --git a/extensions/pref/autoconfig/src/prefcalls.js b/extensions/pref/autoconfig/src/prefcalls.js
-index 66b3977..5469b51 100644
+index 47eb92982c..3207a137b0 100644
 --- a/extensions/pref/autoconfig/src/prefcalls.js
 +++ b/extensions/pref/autoconfig/src/prefcalls.js
-@@ -9,6 +9,54 @@ const LDAPSyncQueryContractID = "@mozilla.org/ldapsyncquery;1";
+@@ -9,6 +9,69 @@ const LDAPSyncQueryContractID = "@mozilla.org/ldapsyncquery;1";
  
  var gIsUTF8;
  
 +{
-+    let profile_directory = null;
-+    let defaults = Services.prefs.getDefaultBranch(null);
++  let profile_directory = null;
++  let defaults = Services.prefs.getDefaultBranch(null);
 +
-+    let supportsXDG = Services.prefs.getBoolPref("widget.support-xdg-config", false);
++  let supportsXDG = Services.prefs.getBoolPref(
++    "widget.support-xdg-config",
++    false
++  );
 +
-+    if (supportsXDG) {
-+      let isLegacy = false;
-+      {
-+        let dirSvc = Cc["@mozilla.org/file/directory_service;1"]
-+                     .getService(Ci.nsIProperties || Ci.nsIDirectoryService);
-+        let profDir = dirSvc.get("ProfD", Ci.nsIFile);
-+        let path = profDir.path || "";
-+        isLegacy = path.includes(".librewolf");
-+      }
++  if (supportsXDG) {
++    let isLegacy = false;
++    {
++      let dirSvc = Cc["@mozilla.org/file/directory_service;1"].getService(
++        Ci.nsIProperties || Ci.nsIDirectoryService
++      );
++      let profDir = dirSvc.get("ProfD", Ci.nsIFile);
++      let path = profDir.path || "";
++      isLegacy = path.includes(".librewolf");
++    }
 +
-+      if (!isLegacy) {
-+        let xdg = Services.env.get("XDG_CONFIG_HOME");
-+        if (xdg) {
-+          profile_directory = xdg;
-+        } else {
-+          let home = Services.env.get("HOME");
-+          profile_directory = home ? (home + "/.config") : null;
-+        }
-+        if (profile_directory) {
-+          defaults.setCharPref(
-+            "autoadmin.global_config_url",
-+            `file://${profile_directory}/librewolf/librewolf/librewolf.overrides.cfg`
-+          );
-+        }
++    if (!isLegacy) {
++      let xdg = Services.env.get("XDG_CONFIG_HOME");
++      if (xdg) {
++        profile_directory = xdg;
 +      } else {
-+        if (profile_directory = Services.env.get("HOME")) {
-+          defaults.setCharPref(
-+            "autoadmin.global_config_url",
-+            `file://${profile_directory}/.librewolf/librewolf.overrides.cfg`
-+          );
-+        }
++        let home = Services.env.get("HOME");
++        profile_directory = home ? home + "/.config" : null;
 +      }
-+    } else {
-+      if ((profile_directory = Services.env.get("USERPROFILE") || Services.env.get("HOME"))) {
++      if (profile_directory) {
 +        defaults.setCharPref(
 +          "autoadmin.global_config_url",
-+          `file://${profile_directory}/.librewolf/librewolf.overrides.cfg`
++          `file://${profile_directory}/librewolf/librewolf/librewolf.overrides.cfg`
++        );
++        defaults.setCharPref(
++          "librewolf.policy.overrides",
++          `file://${profile_directory}/librewolf/librewolf/librewolf.overrides.json`
 +        );
 +      }
++    } else if ((profile_directory = Services.env.get("HOME"))) {
++      defaults.setCharPref(
++        "autoadmin.global_config_url",
++        `file://${profile_directory}/.librewolf/librewolf.overrides.cfg`
++      );
++      defaults.setCharPref(
++        "librewolf.policy.overrides",
++        `file://${profile_directory}/.librewolf/librewolf.overrides.json`
++      );
 +    }
++  } else if (
++    (profile_directory =
++      Services.env.get("USERPROFILE") || Services.env.get("HOME"))
++  ) {
++    defaults.setCharPref(
++      "autoadmin.global_config_url",
++      `file://${profile_directory}/.librewolf/librewolf.overrides.cfg`
++    );
++    defaults.setCharPref(
++      "librewolf.policy.overrides",
++      `file://${profile_directory}/.librewolf/librewolf.overrides.json`
++    );
++  }
 +}
 +
  function getPrefBranch() {
