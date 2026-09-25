@@ -1,8 +1,17 @@
 diff --git a/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs b/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
-index 27cc2bf7e7..91644fb12d 100644
+index 2d3be89304..dc5cf19c03 100644
 --- a/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
 +++ b/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
-@@ -752,17 +752,23 @@ class JSONPoliciesProvider extends PoliciesProvider {
+@@ -24,6 +24,8 @@ const POLICIES_FILENAME = "policies.json";
+ // Load browser policy per-user from /run/user/$UID/appname for
+ // testing only.
+ const PREF_PER_USER_DIR = "toolkit.policies.perUserDir";
++// User overrides policy file
++const PREF_USER_POLICY_OVERRIDES = "librewolf.policy.overrides";
+ // For easy testing, modify the helpers/sample.json file,
+ // and set PREF_ALTERNATE_PATH in firefox.js as:
+ // /your/repo/browser/components/enterprisepolicies/helpers/sample.json
+@@ -753,17 +755,23 @@ class JSONPoliciesProvider extends PoliciesProvider {
      this._readData();
    }
  
@@ -33,7 +42,7 @@ index 27cc2bf7e7..91644fb12d 100644
        }
      }
  
-@@ -775,12 +781,14 @@ class JSONPoliciesProvider extends PoliciesProvider {
+@@ -778,12 +786,34 @@ class JSONPoliciesProvider extends PoliciesProvider {
          configFile = Services.dirsvc.get("XREAppDist", Ci.nsIFile);
        }
        configFile.append(POLICIES_FILENAME);
@@ -46,13 +55,33 @@ index 27cc2bf7e7..91644fb12d 100644
 -      // be handled the same way as if the configFile simply does not exist.
 -      return null;
 +      // No file found
++    }
++
++    try {
++      let configFile = Services.prefs.getCharPref(
++        PREF_USER_POLICY_OVERRIDES,
++        ""
++      );
++
++      if (configFile) {
++        let overrideFile = Cc["@mozilla.org/file/local;1"].createInstance(
++          Ci.nsIFile
++        );
++        overrideFile.initWithPath(configFile);
++
++        if (overrideFile.exists()) {
++          configFiles.push(overrideFile);
++        }
++      }
++    } catch (ex) {
++      // No file found
      }
 +
 +    return configFiles;
    }
  
    _getConfigurationFile() {
-@@ -820,38 +828,68 @@ class JSONPoliciesProvider extends PoliciesProvider {
+@@ -823,38 +853,68 @@ class JSONPoliciesProvider extends PoliciesProvider {
      return configFile;
    }
  
