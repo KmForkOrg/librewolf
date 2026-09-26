@@ -1,5 +1,5 @@
 diff --git a/extensions/pref/autoconfig/src/prefcalls.js b/extensions/pref/autoconfig/src/prefcalls.js
-index 47eb92982c..3207a137b0 100644
+index 47eb92982c..16239bbbd5 100644
 --- a/extensions/pref/autoconfig/src/prefcalls.js
 +++ b/extensions/pref/autoconfig/src/prefcalls.js
 @@ -9,6 +9,69 @@ const LDAPSyncQueryContractID = "@mozilla.org/ldapsyncquery;1";
@@ -41,7 +41,7 @@ index 47eb92982c..3207a137b0 100644
 +        );
 +        defaults.setCharPref(
 +          "librewolf.policy.overrides",
-+          `file://${profile_directory}/librewolf/librewolf/librewolf.overrides.json`
++          `${profile_directory}/librewolf/librewolf/librewolf.overrides.json`
 +        );
 +      }
 +    } else if ((profile_directory = Services.env.get("HOME"))) {
@@ -51,7 +51,7 @@ index 47eb92982c..3207a137b0 100644
 +      );
 +      defaults.setCharPref(
 +        "librewolf.policy.overrides",
-+        `file://${profile_directory}/.librewolf/librewolf.overrides.json`
++        `${profile_directory}/.librewolf/librewolf.overrides.json`
 +      );
 +    }
 +  } else if (
@@ -64,7 +64,7 @@ index 47eb92982c..3207a137b0 100644
 +    );
 +    defaults.setCharPref(
 +      "librewolf.policy.overrides",
-+      `file://${profile_directory}/.librewolf/librewolf.overrides.json`
++      `${profile_directory}/.librewolf/librewolf.overrides.json`
 +    );
 +  }
 +}
