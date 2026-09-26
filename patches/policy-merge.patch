@@ -1,5 +1,5 @@
 diff --git a/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs b/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
-index 2d3be89304..dc5cf19c03 100644
+index 2d3be89304..66ebba37f9 100644
 --- a/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
 +++ b/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
 @@ -24,6 +24,8 @@ const POLICIES_FILENAME = "policies.json";
@@ -38,7 +38,7 @@ index 2d3be89304..dc5cf19c03 100644
 +          configFiles.push(systemConfigFile);
 +        }
 +      } catch (ex) {
-+        // No file found
++        lazy.log.error(`Error reading JSON file: ${ex}`);
        }
      }
  
@@ -54,8 +54,8 @@ index 2d3be89304..dc5cf19c03 100644
 -      // Getting the correct directory will fail in xpcshell tests. This should
 -      // be handled the same way as if the configFile simply does not exist.
 -      return null;
-+      // No file found
-+    }
++      lazy.log.error(`Error reading JSON file: ${ex}`);
+     }
 +
 +    try {
 +      let configFile = Services.prefs.getCharPref(
@@ -74,8 +74,8 @@ index 2d3be89304..dc5cf19c03 100644
 +        }
 +      }
 +    } catch (ex) {
-+      // No file found
-     }
++      lazy.log.error(`Error reading JSON file: ${ex}`);
++    }
 +
 +    return configFiles;
    }
