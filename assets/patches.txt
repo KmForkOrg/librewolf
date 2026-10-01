@@ -20,6 +20,7 @@ patches/include-policy-deletion.patch
 patches/languages.patch
 patches/limit-access.patch
 patches/link-preview.patch
+patches/linux-fonts.patch
 patches/lw-permissions.patch
 patches/moz-configure.patch
 patches/mozilla_dirs.patch
