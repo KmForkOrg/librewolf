@@ -1,0 +1,139 @@
+diff --git a/gfx/thebes/StandardFonts-linux.inc b/gfx/thebes/StandardFonts-linux.inc
+index ce9ff7fa067..a74d9d4e3c0 100644
+--- a/gfx/thebes/StandardFonts-linux.inc
++++ b/gfx/thebes/StandardFonts-linux.inc
+@@ -4,6 +4,21 @@
+ 
+ #ifdef StandardFonts
+ 
++// List of standard font families that should be present in some
++// variation on most Linux installs.
++[[maybe_unused]] static const char* kBaseFonts_generic_Linux[] = {
++    "DejaVu Sans",
++    "DejaVu Sans Mono",
++    "DejaVu Serif",
++    "Liberation Mono",
++    "Liberation Sans",
++    "Liberation Serif",
++    "Noto Sans",
++    "Noto Sans Mono",
++    "Noto Sans Symbols 2",
++    "Noto Serif",
++};
++
+ // List of standard font families present in a default English install
+ // of Ubuntu 22.04:
+ [[maybe_unused]] static const char* kBaseFonts_Ubuntu_22_04[] = {
+diff --git a/gfx/thebes/gfxFcPlatformFontList.cpp b/gfx/thebes/gfxFcPlatformFontList.cpp
+index 642315b0b49..c70c3fefdee 100644
+--- a/gfx/thebes/gfxFcPlatformFontList.cpp
++++ b/gfx/thebes/gfxFcPlatformFontList.cpp
+@@ -1548,6 +1548,7 @@ gfxFcPlatformFontList::gfxFcPlatformFontList()
+       mFcSubstituteCache(64),
+       mLastConfig(nullptr),
+       mAlwaysUseFontconfigGenerics(true) {
++  CheckFamilyList(kBaseFonts_generic_Linux);
+   CheckFamilyList(kBaseFonts_Ubuntu_22_04);
+   CheckFamilyList(kLangFonts_Ubuntu_22_04);
+   CheckFamilyList(kBaseFonts_Ubuntu_20_04);
+@@ -2202,96 +2203,15 @@ void gfxFcPlatformFontList::InitSharedFontListForPlatform() {
+ 
+ FontVisibility gfxFcPlatformFontList::GetVisibilityForFamily(
+     const nsACString& aName) const {
+-  AssignFontVisibilityDevice();
+-
+-  switch (sFontVisibilityDevice) {
+-    case Device::Linux_Ubuntu_any:
+-    case Device::Linux_Ubuntu_22:
+-      if (FamilyInList(aName, kBaseFonts_Ubuntu_22_04)) {
+-        return FontVisibility::Base;
+-      }
+-      if (FamilyInList(aName, kLangFonts_Ubuntu_22_04)) {
+-        return FontVisibility::LangPack;
+-      }
+-      if (sFontVisibilityDevice == Device::Linux_Ubuntu_22) {
+-        return FontVisibility::User;
+-      }
+-      // For Ubuntu_any, we fall through to also check the 20_04 lists.
+-      [[fallthrough]];
+-
+-    case Device::Linux_Ubuntu_20:
+-      if (FamilyInList(aName, kBaseFonts_Ubuntu_20_04)) {
+-        return FontVisibility::Base;
+-      }
+-      if (FamilyInList(aName, kLangFonts_Ubuntu_20_04)) {
+-        return FontVisibility::LangPack;
+-      }
+-      return FontVisibility::User;
+-
+-    case Device::Linux_Fedora_any:
+-      // We have no font list for this Fedora version
+-      return FontVisibility::Unknown;
+-
+-    case Device::Linux_Fedora_39:
+-      if (FamilyInList(aName, kBaseFonts_Fedora_39)) {
+-        return FontVisibility::Base;
+-      }
+-      return FontVisibility::User;
+-
+-    case Device::Linux_Fedora_38:
+-      if (FamilyInList(aName, kBaseFonts_Fedora_38)) {
+-        return FontVisibility::Base;
+-      }
+-      return FontVisibility::User;
+-
+-    default:
+-      // We don't know how to categorize fonts on this system
+-      return FontVisibility::Unknown;
+-  }
++  return FamilyInList(aName, kBaseFonts_generic_Linux) ? FontVisibility::Base
++                                                       : FontVisibility::User;
+ }
+ 
+ nsTArray<std::pair<const char**, uint32_t>>
+ gfxFcPlatformFontList::GetFilteredPlatformFontLists() {
+-  AssignFontVisibilityDevice();
+-
+   nsTArray<std::pair<const char**, uint32_t>> fontLists;
+-
+-  switch (sFontVisibilityDevice) {
+-    case Device::Linux_Ubuntu_any:
+-    case Device::Linux_Ubuntu_22:
+-      fontLists.AppendElement(std::make_pair(
+-          kBaseFonts_Ubuntu_22_04, std::size(kBaseFonts_Ubuntu_22_04)));
+-      fontLists.AppendElement(std::make_pair(
+-          kLangFonts_Ubuntu_22_04, std::size(kLangFonts_Ubuntu_22_04)));
+-      // For Ubuntu_any, we fall through to also check the 20_04 lists.
+-      [[fallthrough]];
+-
+-    case Device::Linux_Ubuntu_20:
+-      fontLists.AppendElement(std::make_pair(
+-          kBaseFonts_Ubuntu_20_04, std::size(kBaseFonts_Ubuntu_20_04)));
+-      fontLists.AppendElement(std::make_pair(
+-          kLangFonts_Ubuntu_20_04, std::size(kLangFonts_Ubuntu_20_04)));
+-      break;
+-
+-    case Device::Linux_Fedora_any:
+-      // No font list for this Fedora version; see GetVisibilityForFamily().
+-      break;
+-
+-    case Device::Linux_Fedora_39:
+-      fontLists.AppendElement(std::make_pair(kBaseFonts_Fedora_39,
+-                                             std::size(kBaseFonts_Fedora_39)));
+-      break;
+-
+-    case Device::Linux_Fedora_38:
+-      fontLists.AppendElement(std::make_pair(kBaseFonts_Fedora_38,
+-                                             std::size(kBaseFonts_Fedora_38)));
+-      break;
+-
+-    default:
+-      // We don't know how to categorize fonts on this system
+-      break;
+-  }
+-
++  fontLists.AppendElement(std::make_pair(kBaseFonts_generic_Linux,
++                                         std::size(kBaseFonts_generic_Linux)));
+   return fontLists;
+ }
+ 
