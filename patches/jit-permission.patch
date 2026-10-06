@@ -1,5 +1,5 @@
 diff --git a/browser/base/content/browser-siteIdentity.js b/browser/base/content/browser-siteIdentity.js
-index 16b222280f..c5099ef596 100644
+index 16b222280f..60e4fe7253 100644
 --- a/browser/base/content/browser-siteIdentity.js
 +++ b/browser/base/content/browser-siteIdentity.js
 @@ -7,6 +7,9 @@ ChromeUtils.defineESModuleGetters(this, {
@@ -61,7 +61,7 @@ index 16b222280f..c5099ef596 100644
          }
          break;
        }
-@@ -1454,4 +1478,80 @@ var gIdentityHandler = {
+@@ -1454,4 +1478,92 @@ var gIdentityHandler = {
        elem.removeAttribute(attr);
      }
    },
@@ -70,12 +70,18 @@ index 16b222280f..c5099ef596 100644
 +    const toggle = document.getElementById("identity-popup-enable-jit-toggle");
 +    const principal = gBrowser.contentPrincipal;
 +
-+    if (!toggle || !principal) {
++    if (!toggle || !principal || !principal.isContentPrincipal) {
 +      return;
 +    }
 +
++    let jitPrincipal =
++      Services.scriptSecurityManager.createContentPrincipalFromOrigin(
++        principal.siteOriginNoSuffix,
++        principal.originAttributes
++      );
++
 +    const permission = Services.perms.testExactPermissionFromPrincipal(
-+      principal,
++      jitPrincipal,
 +      IDENTITY_JIT_PERMISSION
 +    );
 +
@@ -99,14 +105,20 @@ index 16b222280f..c5099ef596 100644
 +  toggleJIT() {
 +    const principal = gBrowser.contentPrincipal;
 +
-+    if (!principal) {
++    if (!principal || !principal.isContentPrincipal) {
 +      return;
 +    }
++
++    let jitPrincipal =
++      Services.scriptSecurityManager.createContentPrincipalFromOrigin(
++        principal.siteOriginNoSuffix,
++        principal.originAttributes
++      );
 +
 +    const defaultEnabled = this._jitEnabled;
 +
 +    const permission = Services.perms.testExactPermissionFromPrincipal(
-+      principal,
++      jitPrincipal,
 +      IDENTITY_JIT_PERMISSION
 +    );
 +
@@ -127,10 +139,10 @@ index 16b222280f..c5099ef596 100644
 +    const enabled = !currentlyEnabled;
 +
 +    if (enabled === defaultEnabled) {
-+      Services.perms.removeFromPrincipal(principal, IDENTITY_JIT_PERMISSION);
++      Services.perms.removeFromPrincipal(jitPrincipal, IDENTITY_JIT_PERMISSION);
 +    } else {
 +      Services.perms.addFromPrincipal(
-+        principal,
++        jitPrincipal,
 +        IDENTITY_JIT_PERMISSION,
 +        enabled ? Services.perms.ALLOW_ACTION : Services.perms.DENY_ACTION,
 +        Services.perms.EXPIRE_NEVER
@@ -143,7 +155,7 @@ index 16b222280f..c5099ef596 100644
 +  },
  };
 diff --git a/browser/base/content/browser-trustPanel.js b/browser/base/content/browser-trustPanel.js
-index 544866fac7..c3fab98d7a 100644
+index 544866fac7..e2ae78615c 100644
 --- a/browser/base/content/browser-trustPanel.js
 +++ b/browser/base/content/browser-trustPanel.js
 @@ -138,6 +138,9 @@ const SMARTBLOCK_EMBED_INFO = [
@@ -183,7 +195,7 @@ index 544866fac7..c3fab98d7a 100644
        document
          .getElementById("trustpanel-siteinformation-morelink")
          .addEventListener("click", () => this.#showSecurityPopup());
-@@ -348,6 +357,82 @@ class TrustPanel {
+@@ -348,6 +357,94 @@ class TrustPanel {
      }
    }
  
@@ -191,12 +203,18 @@ index 544866fac7..c3fab98d7a 100644
 +    const toggle = document.getElementById("trust-panel-enable-jit-toggle");
 +    const principal = gBrowser.contentPrincipal;
 +
-+    if (!toggle || !principal) {
++    if (!toggle || !principal || !principal.isContentPrincipal) {
 +      return;
 +    }
 +
++    let jitPrincipal =
++      Services.scriptSecurityManager.createContentPrincipalFromOrigin(
++        principal.siteOriginNoSuffix,
++        principal.originAttributes
++      );
++
 +    const permission = Services.perms.testExactPermissionFromPrincipal(
-+      principal,
++      jitPrincipal,
 +      TRUST_JIT_PERMISSION
 +    );
 +
@@ -220,14 +238,20 @@ index 544866fac7..c3fab98d7a 100644
 +  #toggleJIT() {
 +    const principal = gBrowser.contentPrincipal;
 +
-+    if (!principal) {
++    if (!principal || !principal.isContentPrincipal) {
 +      return;
 +    }
++
++    let jitPrincipal =
++      Services.scriptSecurityManager.createContentPrincipalFromOrigin(
++        principal.siteOriginNoSuffix,
++        principal.originAttributes
++      );
 +
 +    const defaultEnabled = Services.prefs.getBoolPref(TRUST_JIT_PREF, false);
 +
 +    const permission = Services.perms.testExactPermissionFromPrincipal(
-+      principal,
++      jitPrincipal,
 +      TRUST_JIT_PERMISSION
 +    );
 +
@@ -248,10 +272,10 @@ index 544866fac7..c3fab98d7a 100644
 +    const enabled = !currentlyEnabled;
 +
 +    if (enabled === defaultEnabled) {
-+      Services.perms.removeFromPrincipal(principal, TRUST_JIT_PERMISSION);
++      Services.perms.removeFromPrincipal(jitPrincipal, TRUST_JIT_PERMISSION);
 +    } else {
 +      Services.perms.addFromPrincipal(
-+        principal,
++        jitPrincipal,
 +        TRUST_JIT_PERMISSION,
 +        enabled ? Services.perms.ALLOW_ACTION : Services.perms.DENY_ACTION,
 +        Services.perms.EXPIRE_NEVER
@@ -266,7 +290,7 @@ index 544866fac7..c3fab98d7a 100644
    async showPopup(opts = {}) {
      // Avoid flicker between the mouseup and panel shown by manually
      // setting open attribute.
-@@ -690,6 +775,7 @@ class TrustPanel {
+@@ -690,6 +787,7 @@ class TrustPanel {
      );
  
      await this.#updateMainView();
@@ -274,7 +298,7 @@ index 544866fac7..c3fab98d7a 100644
    }
  
    async #updateMainView() {
-@@ -1883,7 +1969,7 @@ class TrustPanel {
+@@ -1883,7 +1981,7 @@ class TrustPanel {
      return blocked;
    }
  
@@ -283,7 +307,7 @@ index 544866fac7..c3fab98d7a 100644
      if (!this.#enabled) {
        return;
      }
-@@ -1915,6 +2001,12 @@ class TrustPanel {
+@@ -1915,6 +2013,12 @@ class TrustPanel {
          this.showPopup({ reason: "embedPlaceholderButton" });
          break;
        }
@@ -295,7 +319,7 @@ index 544866fac7..c3fab98d7a 100644
 +      }
      }
    }
- 
+  
 diff --git a/browser/components/controlcenter/content/identityPanel.inc.xhtml b/browser/components/controlcenter/content/identityPanel.inc.xhtml
 index d7f214f471..11d37754fc 100644
 --- a/browser/components/controlcenter/content/identityPanel.inc.xhtml
