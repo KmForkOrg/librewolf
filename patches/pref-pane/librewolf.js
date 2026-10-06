@@ -112,6 +112,8 @@ Preferences.addSetting({
 Preferences.addSetting({
   id: "librewolfJIT",
   pref: "librewolf.jit.enabled-by-default",
+  get: (value) => value.value = !value,
+  set: (value) => value.value = !value,
 });
 
 Preferences.addSetting({
