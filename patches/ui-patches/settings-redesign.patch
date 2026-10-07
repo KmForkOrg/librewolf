@@ -158,7 +158,7 @@ index 7123cb0f46..47367e1642 100644
          id: "translationsManageButton",
          loadPane: "translations",
 diff --git a/browser/components/preferences/config/privacy.mjs b/browser/components/preferences/config/privacy.mjs
-index f32ccc4..76a38d9 100644
+index f32ccc4..1e4d6d9 100644
 --- a/browser/components/preferences/config/privacy.mjs
 +++ b/browser/components/preferences/config/privacy.mjs
 @@ -533,6 +533,90 @@ if (SECURITY_PRIVACY_STATUS_CARD_ENABLED) {
@@ -291,7 +291,7 @@ index f32ccc4..76a38d9 100644
    nonTechnicalPrivacy: {
      l10nId: "non-technical-privacy-group",
      headingLevel: 2,
-@@ -690,39 +742,43 @@ SettingGroupManager.registerGroups({
+@@ -690,39 +742,44 @@ SettingGroupManager.registerGroups({
            role: "status",
          },
        },
@@ -318,6 +318,7 @@ index f32ccc4..76a38d9 100644
 +      {
 +        id: "librewolfJIT",
 +        l10nId: "librewolf-jit-checkbox2",
++        supportPage: "jit-toggle",
        },
      ],
    },
@@ -362,7 +363,7 @@ index f32ccc4..76a38d9 100644
        },
      ],
    },
-@@ -866,10 +922,6 @@ SettingGroupManager.registerGroups({
+@@ -866,10 +923,6 @@ SettingGroupManager.registerGroups({
            },
          ],
        },
@@ -373,7 +374,7 @@ index f32ccc4..76a38d9 100644
      ],
    },
    networkProxy: {
-@@ -1034,13 +1086,10 @@ SettingGroupManager.registerGroups({
+@@ -1034,13 +1087,10 @@ SettingGroupManager.registerGroups({
      ],
    },
    historyAdvanced: {
@@ -389,7 +390,7 @@ index f32ccc4..76a38d9 100644
        {
          id: "rememberHistory",
          l10nId: "history-remember-browser-option",
-@@ -1240,19 +1289,15 @@ SettingGroupManager.registerGroups({
+@@ -1240,19 +1290,15 @@ SettingGroupManager.registerGroups({
    etpAdvanced: {
      inProgress: true,
      headingLevel: 2,
@@ -411,7 +412,7 @@ index f32ccc4..76a38d9 100644
            {
              id: "etpLevelStrict",
              subcategory: "etp-strict-control",
-@@ -1274,20 +1319,6 @@ SettingGroupManager.registerGroups({
+@@ -1274,20 +1320,6 @@ SettingGroupManager.registerGroups({
                },
              ],
            },
@@ -432,7 +433,7 @@ index f32ccc4..76a38d9 100644
          ],
        },
        {
-@@ -1303,12 +1334,6 @@ SettingGroupManager.registerGroups({
+@@ -1303,12 +1335,6 @@ SettingGroupManager.registerGroups({
            },
          ],
        },
