@@ -78,10 +78,10 @@ index c2bebf7e96..62ab632cec 100644
    skin/classic/browser/fxa/fxa-spinner.svg                     (../shared/fxa/fxa-spinner.svg)
    skin/classic/browser/fxa/sync-illustration.svg               (../shared/fxa/sync-illustration.svg)
 diff --git a/browser/components/preferences/main.js b/browser/components/preferences/main.js
-index a8de115..b38938a 100644
+index a8de115..f6885f1 100644
 --- a/browser/components/preferences/main.js
 +++ b/browser/components/preferences/main.js
-@@ -571,6 +571,78 @@ SettingGroupManager.registerGroups({
+@@ -571,6 +571,79 @@ SettingGroupManager.registerGroups({
    startup: createStartupConfig(
      Services.prefs.getBoolPref("browser.settings-redesign.enabled", false)
    ),
@@ -128,6 +128,7 @@ index a8de115..b38938a 100644
 +      {
 +        id: "librewolfJIT",
 +        l10nId: "librewolf-jit-checkbox2",
++        supportPage: "jit-toggle",
 +      },
 +      {
 +        id: "librewolfCrossOrigin",
