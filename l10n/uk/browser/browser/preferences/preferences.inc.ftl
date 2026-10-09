@@ -132,6 +132,6 @@ update-application-disabled-choose-2 =
     .label = Вимкнути оновлювач
     .accesskey = D
 update-application-updates-disabled =
-    .message = Вбудований оновлювач вимкнено. Оновлення прийдеться встановлювати вручну або через сторонній механізм.
+    .message = Вбудований оновлювач вимкнено. Оновлення доведеться встановлювати вручну або через сторонній механізм.
 pane-librewolf-title2 = LibreWolf
     .title = LibreWolf
