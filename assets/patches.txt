@@ -45,6 +45,7 @@ patches/ui-patches/allow_cookies_for_site.patch
 patches/ui-patches/allow-disabling-updater.patch
 patches/ui-patches/eme-enable.patch
 patches/ui-patches/home-preferences.patch
+patches/ui-patches/letterboxing-findbar.patch
 patches/ui-patches/lw-logo-devtools.patch
 patches/ui-patches/neterror.patch
 patches/ui-patches/newtab-wordmark-css.patch

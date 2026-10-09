@@ -1,0 +1,39 @@
+diff --git a/toolkit/components/resistfingerprinting/RFPHelper.sys.mjs b/toolkit/components/resistfingerprinting/RFPHelper.sys.mjs
+index f82d730..d5af4fc 100644
+--- a/toolkit/components/resistfingerprinting/RFPHelper.sys.mjs
++++ b/toolkit/components/resistfingerprinting/RFPHelper.sys.mjs
+@@ -119,6 +119,10 @@ class _RFPHelper {
+         resizeObserver.observe(browser.parentElement);
+         break;
+       }
++      case "TabSelect": {
++        this._roundOrResetContentSize(aMessage.target.linkedBrowser);
++        break;
++      }
+       default:
+         break;
+     }
+@@ -377,6 +381,7 @@ class _RFPHelper {
+     if (!aBrowser?.isConnected) {
+       return;
+     }
++
+     if (this._noLetterBoxingFor(aBrowser)) {
+       // this tab doesn't need letterboxing
+       this._resetContentSize(aBrowser);
+@@ -614,6 +619,7 @@ class _RFPHelper {
+   _attachWindow(aWindow) {
+     aWindow.gBrowser.addTabsProgressListener(this);
+     aWindow.addEventListener("TabOpen", this);
++    aWindow.addEventListener("TabSelect", this);
+     let resizeObserver = new aWindow.ResizeObserver(entries => {
+       for (let { target } of entries) {
+         this._roundOrResetContentSize(target.querySelector("browser"));
+@@ -656,6 +662,7 @@ class _RFPHelper {
+     }
+     tabBrowser.removeTabsProgressListener(this);
+     aWindow.removeEventListener("TabOpen", this);
++    aWindow.removeEventListener("TabSelect", this);
+ 
+     // revert tabpanel's style to default
+     tabBrowser.tabpanels?.classList.remove("letterboxing");
