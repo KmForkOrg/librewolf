@@ -8,3 +8,4 @@ urlbar-eme-blocked =
 mullvad-doh-notification-body = Mullvad Säker DNS kommer att <strong>upphöra</strong>. Vänligen granska dina DNS-inställningar nu.
 mullvad-doh-notification-settings-button =
     .label = Granska inställningar
+panel-enable-jit = Aktivera JavaScript JIT
