@@ -135,7 +135,7 @@ index e25447b12a..2b27f23511 100644
 +            control: "moz-box-button",
 +            l10nId: "permissions-jit2",
 +            controlAttrs: {
-+              ".iconSrc": "chrome://browser/skin/lightning-bolt.svg",
++              ".iconSrc": "chrome://browser/skin/jit.svg",
 +              "search-l10n-ids":
 +                "permissions-remove.label,permissions-remove-all.label,permissions-site-jit-window2.title,permissions-site-jit-desc,",
 +            },
