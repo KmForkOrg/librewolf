@@ -55,3 +55,34 @@ index 756325b..3a24503 100644
  #unified-extensions-panel {
    --uei-dot-horizontal-position-in-panel: calc(var(--uei-icon-size) / 2 + var(--panel-menuitem-padding-inline) - var(--uei-attention-dot-size) / 2);
    --uei-dot-vertical-position-in-panel: max(0px, calc(var(--panel-menuitem-padding-block) / 2 - var(--uei-attention-dot-size) / 2));
+diff --git a/browser/components/sidebar/sidebar.css b/browser/components/sidebar/sidebar.css
+index ec6d952..438f609 100644
+--- a/browser/components/sidebar/sidebar.css
++++ b/browser/components/sidebar/sidebar.css
+@@ -46,6 +46,26 @@
+   }
+ }
+ 
++/* Remove Firefox's kit from 'Tabs from other devices' */
++fxview-empty-state {
++  &::part(container) {
++    justify-content: center;
++  }
++  &::part(image-container) {
++    display: none;
++  }
++}
++
++/* Remove Firefox's kit from 'Passwords' */
++.no-logins-card-content {
++  img {
++    display: none;
++  }
++  p[data-l10n-id="contextual-manager-passwords-no-passwords-get-started-message"] {
++    margin-top: 0;
++  }
++}
++
+ body {
+   margin: 0;
+   height: 100%;
