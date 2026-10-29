@@ -38,6 +38,7 @@ patches/ui-patches/add-translate-page-context-menu.patch
 patches/ui-patches/allow-disabling-updater.patch
 patches/ui-patches/allow-cookies-for-site.patch
 patches/ui-patches/eme-enable.patch
+patches/ui-patches/hide-refresh-troubleshoot.patch
 patches/ui-patches/home-preferences.patch
 patches/ui-patches/identity-block.patch
 patches/ui-patches/lw-logo-devtools.patch
