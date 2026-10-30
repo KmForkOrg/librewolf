@@ -32,6 +32,7 @@ patches/mozilla-dirs.patch
 patches/msix.patch
 patches/mullvad-dns-migration.patch
 patches/pip-hide-ui.patch
+patches/pref-pane/pref-pane-small.patch
 patches/profile-directory.patch
 patches/ui-patches/add-translate-page-context-menu.patch.patch
 patches/ui-patches/allow-disabling-updater.patch
