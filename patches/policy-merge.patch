@@ -1,7 +1,7 @@
 Adds the option for a user provided policy override file which gets merged with our own
 ---
 diff --git a/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs b/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
-index 2d3be89304..66ebba37f9 100644
+index 2d3be89..874f632 100644
 --- a/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
 +++ b/toolkit/components/enterprisepolicies/EnterprisePoliciesParent.sys.mjs
 @@ -24,6 +24,8 @@ const POLICIES_FILENAME = "policies.json";
@@ -37,7 +37,7 @@ index 2d3be89304..66ebba37f9 100644
 +        systemConfigFile.append("policies");
 +        systemConfigFile.append(POLICIES_FILENAME);
 +        if (systemConfigFile.exists()) {
-+          configFiles.push(systemConfigFile);
++          configFiles.push({ file: systemConfigFile, isOverride: false });
 +        }
 +      } catch (ex) {
 +        lazy.log.error(`Error reading JSON file: ${ex}`);
@@ -50,7 +50,7 @@ index 2d3be89304..66ebba37f9 100644
        configFile.append(POLICIES_FILENAME);
 -      return configFile;
 +      if (configFile.exists()) {
-+        configFiles.push(configFile);
++        configFiles.push({ file: configFile, isOverride: false });
 +      }
      } catch (ex) {
 -      // Getting the correct directory will fail in xpcshell tests. This should
@@ -72,7 +72,7 @@ index 2d3be89304..66ebba37f9 100644
 +        overrideFile.initWithPath(configFile);
 +
 +        if (overrideFile.exists()) {
-+          configFiles.push(overrideFile);
++          configFiles.push({ file: overrideFile, isOverride: true });
 +        }
 +      }
 +    } catch (ex) {
@@ -83,13 +83,18 @@ index 2d3be89304..66ebba37f9 100644
    }
  
    _getConfigurationFile() {
-@@ -823,38 +853,68 @@ class JSONPoliciesProvider extends PoliciesProvider {
+@@ -823,38 +853,73 @@ class JSONPoliciesProvider extends PoliciesProvider {
      return configFile;
    }
  
-+  _mergePolicies(target, source) {
++  _mergePolicies(target, source, nullDeletes = false) {
 +    for (let key in source) {
-+      if (!source.hasOwnProperty(key)) {
++      if (key === "__proto__" || !Object.hasOwn(source, key) {
++        continue;
++      }
++
++      if (nullDeletes && source[key] === null) {
++        delete target[key];
 +        continue;
 +      }
 +
@@ -97,7 +102,7 @@ index 2d3be89304..66ebba37f9 100644
 +        obj && typeof obj === "object" && !Array.isArray(obj);
 +
 +      if (isPlainObject(source[key]) && isPlainObject(target[key])) {
-+        this._mergePolicies(target[key], source[key]);
++        this._mergePolicies(target[key], source[key], nullDeletes);
 +      } else {
 +        target[key] = source[key];
 +      }
@@ -127,7 +132,7 @@ index 2d3be89304..66ebba37f9 100644
 +
 +    this._policies = {};
 +
-+    for (let configFile of configFiles) {
++    for (let { file: configFile, isOverride } of configFiles) {
 +      try {
 +        let data = Cu.readUTF8File(configFile);
 +        if (data) {
@@ -141,7 +146,7 @@ index 2d3be89304..66ebba37f9 100644
 +            continue;
 +          }
 +
-+          this._mergePolicies(this._policies, parsed);
++          this._mergePolicies(this._policies, parsed, isOverride);
 +        }
 +      } catch (ex) {
 +        if (
