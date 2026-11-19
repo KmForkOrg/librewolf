@@ -1,3 +1,4 @@
+patches/about-librewolf.patch
 patches/add-ku-language.patch
 patches/add-mojeek.patch
 patches/always-fetch-latest-toolchain-artifact.patch
