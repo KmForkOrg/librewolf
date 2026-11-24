@@ -1,15 +1,14 @@
 diff --git a/xpfe/appshell/AppWindow.cpp b/xpfe/appshell/AppWindow.cpp
-index 25995df7d13..d890357298d 100644
+index 25995df7d13..5c219ce41e2 100644
 --- a/xpfe/appshell/AppWindow.cpp
 +++ b/xpfe/appshell/AppWindow.cpp
-@@ -994,6 +994,12 @@ NS_IMETHODIMP AppWindow::ForceRoundedDimensions() {
+@@ -994,6 +994,11 @@ NS_IMETHODIMP AppWindow::ForceRoundedDimensions() {
    // Calculate the chrome UI size.
    CSSIntSize chromeSizeCSS = windowSizeCSS - contentSizeCSS;
  
 +#ifdef MOZ_WIDGET_GTK
-+  chromeSizeCSS.height -= GetOuterToInnerSizeDifferenceInCSSPixels(
-+                              mWindow, UnscaledDevicePixelsPerCSSPixel())
-+                              .height;
++  chromeSizeCSS.height -=
++      GetOuterToInnerSizeDifferenceInCSSPixels(mWindow, scale).height;
 +#endif
 +
    CSSIntSize targetSizeCSS;
