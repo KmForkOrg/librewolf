@@ -1,5 +1,4 @@
-
-
+Fixes wrong rounding behavior with RFP on GTK platforms
 ---
 diff --git a/xpfe/appshell/AppWindow.cpp b/xpfe/appshell/AppWindow.cpp
 index f4a03d3955..0568feb5df 100644
