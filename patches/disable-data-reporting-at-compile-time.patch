@@ -109,7 +109,7 @@ index ab764887e3..de45044228 100644
  
    bool useTelemetry = false;
 -#ifndef FUZZING
-+#if FALSE
++#if false
    if (XRE_IsParentProcess() || XRE_IsContentProcess() || XRE_IsGPUProcess() ||
        XRE_IsRDDProcess() || XRE_IsUtilityProcess()) {
      useTelemetry = true;
