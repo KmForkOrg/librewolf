@@ -1,8 +1,11 @@
+
+
+---
 diff --git a/xpfe/appshell/AppWindow.cpp b/xpfe/appshell/AppWindow.cpp
-index 25995df7d13..5c219ce41e2 100644
+index f4a03d3955..0568feb5df 100644
 --- a/xpfe/appshell/AppWindow.cpp
 +++ b/xpfe/appshell/AppWindow.cpp
-@@ -994,6 +994,11 @@ NS_IMETHODIMP AppWindow::ForceRoundedDimensions() {
+@@ -1044,6 +1044,11 @@ NS_IMETHODIMP AppWindow::ForceRoundedDimensions() {
    // Calculate the chrome UI size.
    CSSIntSize chromeSizeCSS = windowSizeCSS - contentSizeCSS;
  
