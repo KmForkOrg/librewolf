@@ -4,3 +4,6 @@ translations-manage-enable =
     .label = تمكين ترجمة الصفحات الكاملة
 translations-manage-autopopup =
     .label = اسأل قبل ترجمة الصفحات التي ليست بلغة المتصفح المختارة
+main-context-menu-translate-page =
+    .label = ترجمة الصفحة...
+    .accesskey = T

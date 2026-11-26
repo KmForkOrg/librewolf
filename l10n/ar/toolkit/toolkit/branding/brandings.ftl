@@ -4,4 +4,5 @@
 -firefox-suggest-brand-name = الاقتراحات
 -firefox-home-brand-name = الصفحة الرئيسية
 -firefoxview-brand-name = عرض علامات التبويب
--firefoxlabs-brand-name = الميزات التجريبية
+-firefoxlabs-brand-name = مختبرات Firefox من Mozilla
+-relay-brand-name = Relay من Mozilla

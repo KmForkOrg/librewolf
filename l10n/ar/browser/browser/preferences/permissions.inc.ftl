@@ -1,0 +1,14 @@
+permissions-site-eme-window2 =
+    .title = الإعدادات - صلاحيات EME
+    .style = { permissions-window2.style }
+permissions-site-eme-desc = طلبت المواقع الإلكترونية التالية تشغيل محتوى محمي بتقنية إدارة الحقوق الرقمية (DRM). يمكنك تحديد المواقع المسموح لها بتشغيل هذا النوع من المحتوى، كما يمكنك حظر الطلبات الجديدة.
+permissions-site-eme-disable-label =
+    .label = حظر الطلبات الجديدة التي تطلب تشغيل المحتوى المحمي بتقنية إدارة الحقوق الرقمية
+permissions-site-eme-disable-desc = هذا سوف يمنع أي صفحة ليست بالقائمة من طلب الصلاحية لتشغيل المحتوى المحمي بِإدارة الحقوق الرقمية(DRM).
+permissions-site-webgl-window2 =
+    .title = الإعدادات - صلاحيات WebGL
+    .style = { permissions-window2.style }
+permissions-site-jit-window2 =
+    .title = الإعدادات - صلاحيات JIT لـ JavaScript
+    .style = { permissions-window2.style }
+permissions-site-jit-desc = الصفحات التالية لديها صلاحية استخدام JIT لـ JavaScript مخصوصة. تعطيل JIT لـ JavaScript قد يحسِّن الأمان عن طريق تقليل التعرض لبعض الهجمات، لكن قد يجعل المواقع والتطبيقات أبطأ. WebAssembly لن يعمل عند تعطيل JIT.
